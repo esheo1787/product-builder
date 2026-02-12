@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍽️ 오늘 뭐 먹지? - 점심메뉴 추천</title>
+<meta name="description" content="점심 메뉴 고르기 어려울 때! 기분, 상황에 맞는 메뉴를 추천해드립니다.">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf7f2;
+    --surface: #fff;
+    --card: #fff;
+    --primary: #ff6b35;
+    --primary-light: #ff8c5a;
+    --primary-bg: #fff4ef;
+    --accent: #e8523f;
+    --green: #2ecc71;
+    --blue: #3498db;
+    --purple: #9b59b6;
+    --text: #2d2d2d;
+    --text-light: #777;
+    --border: #eee;
+    --shadow: 0 2px 20px rgba(0,0,0,0.06);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 48px 24px 32px;
+    position: relative;
+  }
+  .header-emoji {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 8px;
+    animation: wiggle 2s ease-in-out infinite;
+  }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+  }
+  .header h1 {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(2rem, 7vw, 3rem);
+    color: var(--primary);
+    letter-spacing: -1px;
+    margin-bottom: 6px;
+  }
+  .header .subtitle {
+    font-size: 0.95rem;
+    color: var(--text-light);
+  }
+
+  /* Main container */
+  .container {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 0 20px 40px;
+  }
+
+  /* Filter tags */
+  .filter-section {
+    margin-bottom: 24px;
+  }
+  .filter-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+  .filter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .filter-tag {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .filter-tag:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  .filter-tag.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+  }
+
+  /* Result card */
+  .result-card {
+    background: var(--card);
+    border-radius: 24px;
+    box-shadow: var(--shadow-lg);
+    padding: 40px 28px;
+    text-align: center;
+    margin-bottom: 24px;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+
+  .result-card .food-emoji {
+    font-size: 5rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .result-card .food-name {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 2.2rem;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .result-card .food-desc {
+    font-size: 0.92rem;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+  .result-card .food-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .food-tag-badge {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+  .tag-category {
+    background: var(--primary-bg);
+    color: var(--primary);
+  }
+  .tag-price {
+    background: #e8f8f0;
+    color: #27ae60;
+  }
+  .tag-time {
+    background: #eef2ff;
+    color: #5b6abf;
+  }
+  .tag-spicy {
+    background: #ffeef0;
+    color: #e74c3c;
+  }
+
+  /* Placeholder state */
+  .placeholder-state {
+    text-align: center;
+    color: var(--text-light);
+  }
+  .placeholder-state .big-emoji {
+    font-size: 4rem;
+    margin-bottom: 12px;
+    display: block;
+    opacity: 0.7;
+  }
+  .placeholder-state p {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Spinning state */
+  .spin-state .spin-emoji {
+    font-size: 5rem;
+    display: block;
+    animation: slotSpin 0.1s linear infinite;
+  }
+  @keyframes slotSpin {
+    0% { transform: translateY(-20px); opacity: 0; }
+    50% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(20px); opacity: 0; }
+  }
+
+  /* Reveal animation */
+  .reveal .food-emoji {
+    animation: revealPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .reveal .food-name {
+    animation: revealSlide 0.5s ease-out 0.15s both;
+  }
+  .reveal .food-desc {
+    animation: revealSlide 0.5s ease-out 0.25s both;
+  }
+  .reveal .food-tags {
+    animation: revealSlide 0.5s ease-out 0.35s both;
+  }
+  @keyframes revealPop {
+    from { transform: scale(0) rotate(-20deg); opacity: 0; }
+    to { transform: scale(1) rotate(0deg); opacity: 1; }
+  }
+  @keyframes revealSlide {
+    from { transform: translateY(15px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* Confetti burst */
+  .confetti-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .confetti {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    top: 50%;
+    left: 50%;
+    animation: confettiBurst 1s ease-out forwards;
+  }
+  @keyframes confettiBurst {
+    0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+    100% { transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(0); opacity: 0; }
+  }
+
+  /* Button */
+  .btn-area {
+    margin-bottom: 28px;
+  }
+  .recommend-btn {
+    width: 100%;
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1.3rem;
+    padding: 18px 32px;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    box-shadow: 0 4px 20px rgba(255,107,53,0.3);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    letter-spacing: 1px;
+  }
+  .recommend-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(255,107,53,0.4);
+  }
+  .recommend-btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+  .recommend-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .re-roll-btn {
+    display: none;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 14px 24px;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    cursor: pointer;
+    color: var(--text-light);
+    background: var(--surface);
+    transition: all 0.2s;
+    margin-top: 10px;
+  }
+  .re-roll-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  .re-roll-btn.show { display: block; }
+
+  /* History */
+  .history-section {
+    margin-top: 16px;
+    display: none;
+  }
+  .history-section.show { display: block; }
+  .history-header {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-light);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border-radius: 14px;
+    padding: 12px 16px;
+    box-shadow: var(--shadow);
+    animation: slideIn 0.3s ease-out;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .history-item .h-emoji {
+    font-size: 1.8rem;
+  }
+  .history-item .h-info {
+    flex: 1;
+  }
+  .history-item .h-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .history-item .h-cat {
+    font-size: 0.78rem;
+    color: var(--text-light);
+  }
+  .history-item .h-time {
+    font-size: 0.72rem;
+    color: var(--text-light);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 32px 20px;
+    font-size: 0.75rem;
+    color: #bbb;
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 480px) {
+    .header { padding: 32px 20px 24px; }
+    .result-card { padding: 32px 20px; min-height: 240px; }
+    .result-card .food-emoji { font-size: 4rem; }
+    .result-card .food-name { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="header-emoji">🍽️</span>
+  <h1>오늘 뭐 먹지?</h1>
+  <p class="subtitle">점심 메뉴 고민 끝! 버튼 하나로 해결하세요</p>
+</div>
+
+<div class="container">
+
+  <div class="filter-section">
+    <div class="filter-label">기분 / 상황</div>
+    <div class="filter-tags" id="moodTags">
+      <div class="filter-tag active" data-mood="all">전체</div>
+      <div class="filter-tag" data-mood="quick">⚡ 빨리</div>
+      <div class="filter-tag" data-mood="hearty">🔥 든든하게</div>
+      <div class="filter-tag" data-mood="light">🥗 가볍게</div>
+      <div class="filter-tag" data-mood="special">✨ 특별하게</div>
+      <div class="filter-tag" data-mood="comfort">🫶 위로</div>
+    </div>
+  </div>
+
+  <div class="filter-section">
+    <div class="filter-label">카테고리</div>
+    <div class="filter-tags" id="catTags">
+      <div class="filter-tag active" data-cat="all">전체</div>
+      <div class="filter-tag" data-cat="korean">🇰🇷 한식</div>
+      <div class="filter-tag" data-cat="chinese">🇨🇳 중식</div>
+      <div class="filter-tag" data-cat="japanese">🇯🇵 일식</div>
+      <div class="filter-tag" data-cat="western">🍝 양식</div>
+      <div class="filter-tag" data-cat="asian">🌏 아시안</div>
+      <div class="filter-tag" data-cat="snack">🍔 분식/패스트</div>
+    </div>
+  </div>
+
+  <div class="result-card" id="resultCard">
+    <div class="placeholder-state" id="placeholder">
+      <span class="big-emoji">🤔</span>
+      <p>오늘 점심 뭐 먹을지 고민되시나요?<br>아래 버튼을 눌러보세요!</p>
+    </div>
+  </div>
+
+  <div class="btn-area">
+    <button class="recommend-btn" id="mainBtn" onclick="recommend()">메뉴 추천 받기 🎲</button>
+    <button class="re-roll-btn" id="rerollBtn" onclick="recommend()">🔄 다른 메뉴 보기</button>
+  </div>
+
+  <div class="history-section" id="historySection">
+    <div class="history-header">📋 추천 기록</div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+</div>
+
+<div class="footer">
+  오늘도 맛있는 점심 되세요! 🍴
+</div>
+
+<script>
+const MENUS = [
+  // 한식 - Korean
+  { name: "김치찌개", emoji: "🍲", desc: "칼칼한 김치와 돼지고기의 완벽 조화", category: "korean", moods: ["hearty", "comfort"], price: "보통", time: "보통", spicy: true },
+  { name: "된장찌개", emoji: "🫕", desc: "구수한 된장에 두부, 호박의 건강한 한 끼", category: "korean", moods: ["comfort", "light"], price: "보통", time: "보통", spicy: false },
+  { name: "비빔밥", emoji: "🍚", desc: "형형색색 나물과 고추장의 하모니", category: "korean", moods: ["hearty", "light"], price: "보통", time: "빠름", spicy: true },
+  { name: "불고기 정식", emoji: "🥩", desc: "달콤한 간장 양념 불고기에 밥 한 공기", category: "korean", moods: ["hearty", "special"], price: "보통", time: "보통", spicy: false },
+  { name: "순대국밥", emoji: "🍜", desc: "뜨끈한 국물에 순대와 내장, 소주 한 잔?", category: "korean", moods: ["hearty", "comfort"], price: "저렴", time: "빠름", spicy: false },
+  { name: "제육볶음", emoji: "🥘", desc: "매콤달콤 돼지고기 볶음의 정석", category: "korean", moods: ["hearty", "quick"], price: "보통", time: "빠름", spicy: true },
+  { name: "삼겹살", emoji: "🥓", desc: "구워 먹는 삼겹살은 진리! 회식 느낌으로", category: "korean", moods: ["special", "hearty"], price: "비쌈", time: "느림", spicy: false },
+  { name: "칼국수", emoji: "🍜", desc: "쫄깃한 면발과 시원한 국물의 만남", category: "korean", moods: ["comfort", "light"], price: "저렴", time: "빠름", spicy: false },
+  { name: "떡볶이 + 튀김 세트", emoji: "🍢", desc: "매콤 달콤 국민간식, 튀김은 필수", category: "korean", moods: ["quick", "comfort"], price: "저렴", time: "빠름", spicy: true },
+  { name: "한우 국밥", emoji: "🥣", desc: "진하게 우려낸 국밥 한 그릇의 행복", category: "korean", moods: ["hearty", "comfort"], price: "보통", time: "빠름", spicy: false },
+  { name: "닭볶음탕", emoji: "🍗", desc: "매콤한 닭볶음탕에 감자가 포인트", category: "korean", moods: ["hearty", "comfort"], price: "보통", time: "보통", spicy: true },
+  { name: "김밥 + 라면", emoji: "🍙", desc: "김밥천국 국룰 조합, 가성비 최고", category: "korean", moods: ["quick", "comfort"], price: "저렴", time: "빠름", spicy: false },
+  { name: "감자탕", emoji: "🦴", desc: "뼈다귀에서 우러나는 깊은 맛의 감자탕", category: "korean", moods: ["hearty", "comfort"], price: "보통", time: "보통", spicy: true },
+  { name: "냉면", emoji: "🍜", desc: "시원한 육수에 면 한 젓가락, 상쾌한 한 끼", category: "korean", moods: ["light", "quick"], price: "보통", time: "빠름", spicy: false },
+
+  // 중식 - Chinese
+  { name: "짜장면", emoji: "🍝", desc: "춘장의 달콤함, 국민 중화요리의 자존심", category: "chinese", moods: ["quick", "comfort"], price: "저렴", time: "빠름", spicy: false },
+  { name: "짬뽕", emoji: "🍜", desc: "얼큰한 해물 국물이 화끈하게!", category: "chinese", moods: ["hearty", "quick"], price: "저렴", time: "빠름", spicy: true },
+  { name: "탕수육", emoji: "🍖", desc: "바삭한 튀김에 새콤달콤 소스, 부먹 vs 찍먹", category: "chinese", moods: ["special", "hearty"], price: "보통", time: "보통", spicy: false },
+  { name: "마파두부 덮밥", emoji: "🌶️", desc: "얼얼하고 매운 마파두부의 중독성", category: "chinese", moods: ["hearty", "quick"], price: "저렴", time: "빠름", spicy: true },
+  { name: "볶음밥", emoji: "🍳", desc: "웍에서 볶아낸 고슬고슬 볶음밥", category: "chinese", moods: ["quick", "hearty"], price: "저렴", time: "빠름", spicy: false },
+  { name: "양장피", emoji: "🥗", desc: "겨자 소스가 핵심! 채소와 해물의 시원함", category: "chinese", moods: ["light", "special"], price: "비쌈", time: "보통", spicy: false },
+
+  // 일식 - Japanese
+  { name: "초밥", emoji: "🍣", desc: "신선한 회와 밥의 한입 행복", category: "japanese", moods: ["special", "light"], price: "비쌈", time: "보통", spicy: false },
+  { name: "라멘", emoji: "🍜", desc: "진한 돈코츠 육수에 차슈 토핑 한가득", category: "japanese", moods: ["hearty", "comfort"], price: "보통", time: "빠름", spicy: false },
+  { name: "돈카츠", emoji: "🍱", desc: "두껍게 썬 등심, 바삭한 튀김옷의 정석", category: "japanese", moods: ["hearty", "special"], price: "보통", time: "보통", spicy: false },
+  { name: "우동", emoji: "🍲", desc: "따뜻한 국물에 쫄깃한 우동면, 마음이 편해져요", category: "japanese", moods: ["comfort", "light", "quick"], price: "저렴", time: "빠름", spicy: false },
+  { name: "카레라이스", emoji: "🍛", desc: "달콤하고 부드러운 일본식 카레 한 접시", category: "japanese", moods: ["comfort", "hearty"], price: "저렴", time: "빠름", spicy: false },
+  { name: "규동 (소고기덮밥)", emoji: "🥩", desc: "달짝지근한 소고기와 양파 덮밥", category: "japanese", moods: ["quick", "hearty"], price: "저렴", time: "빠름", spicy: false },
+  { name: "사시미 정식", emoji: "🐟", desc: "신선한 회에 밥, 된장국까지 풀코스", category: "japanese", moods: ["special", "light"], price: "비쌈", time: "보통", spicy: false },
+
+  // 양식 - Western
+  { name: "파스타", emoji: "🍝", desc: "크림? 토마토? 오일? 골라먹는 재미", category: "western", moods: ["special", "light"], price: "보통", time: "보통", spicy: false },
+  { name: "스테이크", emoji: "🥩", desc: "미디엄 레어로 구운 육즙 가득 스테이크", category: "western", moods: ["special", "hearty"], price: "비쌈", time: "느림", spicy: false },
+  { name: "피자", emoji: "🍕", desc: "치즈가 쭈욱~ 늘어나는 피자 한 판", category: "western", moods: ["hearty", "comfort"], price: "보통", time: "보통", spicy: false },
+  { name: "햄버거", emoji: "🍔", desc: "수제 패티에 치즈 한 장, 완벽한 한 끼", category: "western", moods: ["quick", "hearty"], price: "보통", time: "빠름", spicy: false },
+  { name: "리조또", emoji: "🍚", desc: "크리미한 치즈 리조또, 한 숟갈의 행복", category: "western", moods: ["special", "comfort"], price: "보통", time: "보통", spicy: false },
+  { name: "샌드위치", emoji: "🥪", desc: "신선한 야채와 고기가 가득, 건강하게!", category: "western", moods: ["quick", "light"], price: "저렴", time: "빠름", spicy: false },
+  { name: "샐러드 + 수프", emoji: "🥗", desc: "가볍고 건강한 한 끼, 다이어트엔 이거지", category: "western", moods: ["light"], price: "보통", time: "빠름", spicy: false },
+
+  // 아시안 - Asian
+  { name: "쌀국수 (포)", emoji: "🍜", desc: "맑은 국물에 라임 한 방, 베트남의 맛", category: "asian", moods: ["light", "quick"], price: "보통", time: "빠름", spicy: false },
+  { name: "팟타이", emoji: "🍝", desc: "새콤달콤 태국식 볶음면, 땅콩이 포인트", category: "asian", moods: ["light", "special"], price: "보통", time: "보통", spicy: false },
+  { name: "똠양꿍", emoji: "🍲", desc: "시고 매운 태국식 새우 수프, 중독주의!", category: "asian", moods: ["special", "hearty"], price: "보통", time: "보통", spicy: true },
+  { name: "분짜", emoji: "🥗", desc: "달콤한 소스에 구운 고기와 쌀국수", category: "asian", moods: ["light", "special"], price: "보통", time: "보통", spicy: false },
+  { name: "카오팟 (태국볶음밥)", emoji: "🍳", desc: "바질향 가득한 태국식 볶음밥", category: "asian", moods: ["quick", "hearty"], price: "저렴", time: "빠름", spicy: true },
+  { name: "반미 (바게트 샌드위치)", emoji: "🥖", desc: "바삭한 바게트에 베트남 재료 가득", category: "asian", moods: ["quick", "light"], price: "저렴", time: "빠름", spicy: false },
+
+  // 분식/패스트 - Snack/Fast
+  { name: "치킨", emoji: "🍗", desc: "후라이드? 양념? 둘 다 반반이 정답!", category: "snack", moods: ["hearty", "comfort"], price: "보통", time: "보통", spicy: false },
+  { name: "짜장 떡볶이", emoji: "🍢", desc: "짜장 소스 떡볶이, 새로운 맛의 세계", category: "snack", moods: ["quick", "comfort"], price: "저렴", time: "빠름", spicy: false },
+  { name: "김치볶음밥", emoji: "🍳", desc: "김치와 밥의 국룰 조합, 계란 프라이 필수", category: "snack", moods: ["quick", "comfort"], price: "저렴", time: "빠름", spicy: true },
+  { name: "타코", emoji: "🌮", desc: "바삭한 또띠아에 살사 소스, 멕시칸 느낌", category: "snack", moods: ["quick", "special"], price: "보통", time: "빠름", spicy: true },
+  { name: "핫도그 + 감튀", emoji: "🌭", desc: "간편하고 맛있는 길거리 푸드 조합", category: "snack", moods: ["quick"], price: "저렴", time: "빠름", spicy: false },
+  { name: "컵밥 / 도시락", emoji: "🍱", desc: "간편하게 든든하게, 편의점도 OK", category: "snack", moods: ["quick", "light"], price: "저렴", time: "빠름", spicy: false },
+];
+
+let selectedMood = "all";
+let selectedCat = "all";
+let history = [];
+let spinning = false;
+let lastRecommended = null;
+
+// Filter tag click handlers
+document.getElementById('moodTags').addEventListener('click', (e) => {
+  const tag = e.target.closest('.filter-tag');
+  if (!tag) return;
+  document.querySelectorAll('#moodTags .filter-tag').forEach(t => t.classList.remove('active'));
+  tag.classList.add('active');
+  selectedMood = tag.dataset.mood;
+});
+
+document.getElementById('catTags').addEventListener('click', (e) => {
+  const tag = e.target.closest('.filter-tag');
+  if (!tag) return;
+  document.querySelectorAll('#catTags .filter-tag').forEach(t => t.classList.remove('active'));
+  tag.classList.add('active');
+  selectedCat = tag.dataset.cat;
+});
+
+function getFilteredMenus() {
+  return MENUS.filter(m => {
+    const moodOk = selectedMood === "all" || m.moods.includes(selectedMood);
+    const catOk = selectedCat === "all" || m.category === selectedCat;
+    return moodOk && catOk;
+  });
+}
+
+function recommend() {
+  if (spinning) return;
+  const filtered = getFilteredMenus();
+  if (filtered.length === 0) {
+    const card = document.getElementById('resultCard');
+    card.innerHTML = `
+      <div class="placeholder-state">
+        <span class="big-emoji">😅</span>
+        <p>조건에 맞는 메뉴가 없어요!<br>필터를 바꿔보세요~</p>
+      </div>`;
+    return;
+  }
+
+  spinning = true;
+  const btn = document.getElementById('mainBtn');
+  const card = document.getElementById('resultCard');
+  btn.disabled = true;
+
+  // Spinning animation
+  const spinEmojis = MENUS.map(m => m.emoji);
+  let spinCount = 0;
+  const spinInterval = setInterval(() => {
+    const randomEmoji = spinEmojis[Math.floor(Math.random() * spinEmojis.length)];
+    card.innerHTML = `<div class="spin-state"><span class="spin-emoji">${randomEmoji}</span></div>`;
+    spinCount++;
+  }, 80);
+
+  setTimeout(() => {
+    clearInterval(spinInterval);
+
+    // Pick a random menu, avoid repeating last if possible
+    let pool = filtered.length > 1 ? filtered.filter(m => m !== lastRecommended) : filtered;
+    const menu = pool[Math.floor(Math.random() * pool.length)];
+    lastRecommended = menu;
+
+    // Build tags
+    const catLabel = { korean: "한식", chinese: "중식", japanese: "일식", western: "양식", asian: "아시안", snack: "분식/패스트" };
+    let tags = `<span class="food-tag-badge tag-category">${catLabel[menu.category]}</span>`;
+    tags += `<span class="food-tag-badge tag-price">💰 ${menu.price}</span>`;
+    tags += `<span class="food-tag-badge tag-time">⏱ ${menu.time}</span>`;
+    if (menu.spicy) tags += `<span class="food-tag-badge tag-spicy">🌶️ 매움</span>`;
+
+    card.className = 'result-card reveal';
+    card.innerHTML = `
+      <div class="confetti-container" id="confetti"></div>
+      <span class="food-emoji">${menu.emoji}</span>
+      <div class="food-name">${menu.name}</div>
+      <div class="food-desc">${menu.desc}</div>
+      <div class="food-tags">${tags}</div>`;
+
+    // Confetti burst
+    createConfetti();
+
+    // Add to history
+    addHistory(menu);
+
+    // Show reroll button
+    document.getElementById('rerollBtn').classList.add('show');
+
+    btn.disabled = false;
+    spinning = false;
+
+    // Remove reveal class after animation
+    setTimeout(() => card.classList.remove('reveal'), 800);
+  }, 1200);
+}
+
+function createConfetti() {
+  const container = document.getElementById('confetti');
+  if (!container) return;
+  const colors = ['#ff6b35', '#ffd700', '#ff4081', '#2ecc71', '#3498db', '#9b59b6', '#ff9800'];
+  for (let i = 0; i < 30; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.background = colors[Math.floor(Math.random() * colors.length)];
+    const angle = (Math.PI * 2 * i) / 30;
+    const dist = 80 + Math.random() * 120;
+    c.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+    c.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+    c.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+    c.style.animationDelay = Math.random() * 0.2 + 's';
+    container.appendChild(c);
+  }
+}
+
+function addHistory(menu) {
+  const now = new Date();
+  const timeStr = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+  const catLabel = { korean: "한식", chinese: "중식", japanese: "일식", western: "양식", asian: "아시안", snack: "분식/패스트" };
+
+  history.unshift({ name: menu.name, emoji: menu.emoji, cat: catLabel[menu.category], time: timeStr });
+  if (history.length > 8) history.pop();
+
+  const section = document.getElementById('historySection');
+  const list = document.getElementById('historyList');
+  section.classList.add('show');
+
+  list.innerHTML = history.map(h => `
+    <div class="history-item">
+      <span class="h-emoji">${h.emoji}</span>
+      <div class="h-info">
+        <div class="h-name">${h.name}</div>
+        <div class="h-cat">${h.cat}</div>
+      </div>
+      <span class="h-time">${h.time}</span>
+    </div>
+  `).join('');
+}
+</script>
+
+</body>
+</html>
