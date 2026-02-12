@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🍀 로또 번호 추천기</title>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f1a;
+    --surface: #1a1a2e;
+    --card: #22223a;
+    --gold: #ffd700;
+    --gold2: #ffaa00;
+    --pink: #ff4081;
+    --blue: #448aff;
+    --cyan: #00e5ff;
+    --green: #69f0ae;
+    --text: #eeeef5;
+    --dim: #7777aa;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Sparkle background */
+  .sparkles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .sparkle {
+    position: absolute;
+    width: 3px; height: 3px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: twinkle var(--dur) ease-in-out infinite;
+    opacity: 0;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: var(--op); transform: scale(1.2); }
+  }
+
+  .main-container {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 40px 24px;
+    max-width: 600px;
+    width: 100%;
+  }
+
+  /* Title */
+  .title-area {
+    margin-bottom: 48px;
+  }
+  .title-icon {
+    font-size: 3.5rem;
+    display: block;
+    margin-bottom: 12px;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  h1 {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: clamp(2.2rem, 7vw, 3.2rem);
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, var(--gold), var(--gold2), var(--pink));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    font-size: 0.95rem;
+    color: var(--dim);
+  }
+
+  /* Ball display area */
+  .ball-stage {
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 40px;
+    position: relative;
+  }
+
+  .set-row {
+    opacity: 0;
+    animation: fadeRow 0.3s ease-out forwards;
+  }
+  @keyframes fadeRow {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .set-label {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1rem;
+    color: var(--dim);
+    min-width: 28px;
+    text-align: center;
+  }
+
+  .balls-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .ball {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1.5rem;
+    color: #fff;
+    position: relative;
+    opacity: 0;
+    transform: scale(0) rotate(-180deg);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    box-shadow:
+      inset 0 -4px 8px rgba(0,0,0,0.25),
+      inset 0 4px 8px rgba(255,255,255,0.2),
+      0 4px 20px rgba(0,0,0,0.3);
+  }
+  .ball.show {
+    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  .ball::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 10px;
+    background: rgba(255,255,255,0.35);
+    border-radius: 50%;
+    top: 10px; left: 16px;
+    transform: rotate(-20deg);
+  }
+
+  .ball.range-1  { background: linear-gradient(145deg, #ffc107, #ff9800); }
+  .ball.range-10 { background: linear-gradient(145deg, #448aff, #2962ff); }
+  .ball.range-20 { background: linear-gradient(145deg, #ff4081, #e91e63); }
+  .ball.range-30 { background: linear-gradient(145deg, #7c7c7c, #555); }
+  .ball.range-40 { background: linear-gradient(145deg, #69f0ae, #00c853); }
+
+  .plus-sign {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1.6rem;
+    color: var(--dim);
+    opacity: 0;
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .ball.bonus {
+    box-shadow:
+      inset 0 -4px 8px rgba(0,0,0,0.25),
+      inset 0 4px 8px rgba(255,255,255,0.2),
+      0 0 20px rgba(255,215,0,0.4),
+      0 0 40px rgba(255,215,0,0.15);
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0) rotate(-180deg); }
+    to { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+
+  /* Placeholder */
+  .placeholder {
+    color: var(--dim);
+    font-size: 1rem;
+  }
+  .placeholder span {
+    display: inline-block;
+    animation: dotPulse 1.5s ease-in-out infinite;
+  }
+  .placeholder span:nth-child(2) { animation-delay: 0.15s; }
+  .placeholder span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes dotPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  /* Button */
+  .btn-area { margin-bottom: 32px; }
+
+  .generate-btn {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 1.3rem;
+    padding: 18px 56px;
+    border: none;
+    border-radius: 60px;
+    cursor: pointer;
+    color: #0f0f1a;
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    box-shadow: 0 6px 30px rgba(255,215,0,0.25);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 1px;
+  }
+  .generate-btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 10px 40px rgba(255,215,0,0.35);
+  }
+  .generate-btn:active {
+    transform: translateY(0) scale(0.97);
+  }
+  .generate-btn.spinning {
+    pointer-events: none;
+    animation: shake 0.4s ease-in-out;
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px) rotate(-2deg); }
+    40% { transform: translateX(6px) rotate(2deg); }
+    60% { transform: translateX(-4px) rotate(-1deg); }
+    80% { transform: translateX(4px) rotate(1deg); }
+  }
+
+  /* History */
+  .history-area {
+    margin-top: 20px;
+    width: 100%;
+  }
+  .history-title {
+    font-size: 0.8rem;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--dim) transparent;
+  }
+  .history-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 12px;
+    padding: 10px 16px;
+    animation: slideIn 0.3s ease-out;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .history-num {
+    font-size: 0.7rem;
+    color: var(--dim);
+    min-width: 28px;
+  }
+  .mini-balls {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .mini-ball {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.15);
+  }
+  .mini-plus {
+    font-size: 0.8rem;
+    color: var(--dim);
+    font-weight: 700;
+  }
+
+  .footer-note {
+    margin-top: 48px;
+    font-size: 0.75rem;
+    color: rgba(119,119,170,0.5);
+  }
+
+  .stats-info {
+    margin-bottom: 28px;
+    text-align: center;
+  }
+  .stats-badge {
+    display: inline-block;
+    font-size: 0.78rem;
+    color: var(--gold);
+    background: rgba(255,215,0,0.07);
+    border: 1px solid rgba(255,215,0,0.15);
+    border-radius: 8px;
+    padding: 6px 16px;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+  .hot-cold {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .hc-group {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 10px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid rgba(255,255,255,0.04);
+  }
+  .hc-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .hot-label { color: #ff6b6b; }
+  .cold-label { color: #74b9ff; }
+  .hc-nums {
+    font-size: 0.8rem;
+    color: var(--dim);
+    font-weight: 600;
+  }
+
+  @media (max-width: 480px) {
+    .ball { width: 52px; height: 52px; font-size: 1.2rem; }
+    .balls-row { gap: 7px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sparkles" id="sparkles"></div>
+
+<div class="main-container">
+
+  <div class="title-area">
+    <span class="title-icon">🎱</span>
+    <h1>로또 번호 추천기</h1>
+    <p class="subtitle">역대 당첨 통계 기반으로 행운의 5세트를 뽑아보세요</p>
+  </div>
+
+  <div class="ball-stage" id="ballStage">
+    <div class="placeholder">
+      버튼을 눌러 번호를 뽑아보세요 <span>.</span><span>.</span><span>.</span>
+    </div>
+  </div>
+
+  <div class="btn-area">
+    <button class="generate-btn" id="genBtn" onclick="generate()">번호 뽑기 🎰</button>
+  </div>
+
+  <div class="stats-info">
+    <div class="stats-badge">📊 1회~1210회 역대 통계 기반 가중 추첨</div>
+    <div class="hot-cold">
+      <div class="hc-group">
+        <span class="hc-label hot-label">🔥 최다 출현</span>
+        <span class="hc-nums">27 · 12 · 34 · 33 · 17 · 13</span>
+      </div>
+      <div class="hc-group">
+        <span class="hc-label cold-label">🧊 최소 출현</span>
+        <span class="hc-nums">9 · 5 · 8 · 23 · 39 · 22</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="history-area" id="historyArea" style="display:none;">
+    <div class="history-title">📋 이전 추천 기록</div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+  <p class="footer-note">※ 1회~1210회 역대 출현 빈도를 가중치로 반영한 추첨이며 당첨을 보장하지 않습니다</p>
+
+</div>
+
+<script>
+  // Create sparkle bg
+  const sparklesEl = document.getElementById('sparkles');
+  for (let i = 0; i < 50; i++) {
+    const s = document.createElement('div');
+    s.className = 'sparkle';
+    s.style.left = Math.random() * 100 + '%';
+    s.style.top = Math.random() * 100 + '%';
+    s.style.setProperty('--dur', (3 + Math.random() * 5) + 's');
+    s.style.setProperty('--op', (0.3 + Math.random() * 0.5).toString());
+    s.style.animationDelay = Math.random() * 5 + 's';
+    sparklesEl.appendChild(s);
+  }
+
+  let historyCount = 0;
+
+  function getBallClass(num) {
+    if (num <= 10) return 'range-1';
+    if (num <= 20) return 'range-10';
+    if (num <= 30) return 'range-20';
+    if (num <= 40) return 'range-30';
+    return 'range-40';
+  }
+
+  function getBallBg(num) {
+    if (num <= 10) return 'linear-gradient(145deg, #ffc107, #ff9800)';
+    if (num <= 20) return 'linear-gradient(145deg, #448aff, #2962ff)';
+    if (num <= 30) return 'linear-gradient(145deg, #ff4081, #e91e63)';
+    if (num <= 40) return 'linear-gradient(145deg, #7c7c7c, #555)';
+    return 'linear-gradient(145deg, #69f0ae, #00c853)';
+  }
+
+  // ═══════════════════════════════════════════════════
+  // 역대 로또 1회~1210회 번호별 출현 횟수 (보너스 포함)
+  // 출처: 동행복권 공식 통계 + vyomakesa.com (2026.02.07 기준)
+  // ═══════════════════════════════════════════════════
+  const FREQ = {
+     1:199,  2:187,  3:200,  4:194,  5:176,
+     6:197,  7:200,  8:178,  9:158, 10:185,
+    11:190, 12:204, 13:201, 14:192, 15:188,
+    16:186, 17:202, 18:189, 19:185, 20:196,
+    21:193, 22:181, 23:179, 24:196, 25:183,
+    26:195, 27:208, 28:186, 29:182, 30:187,
+    31:191, 32:184, 33:203, 34:204, 35:190,
+    36:192, 37:197, 38:197, 39:180, 40:191,
+    41:186, 42:183, 43:197, 44:193, 45:190
+  };
+
+  // 출현 빈도 기반 가중 랜덤 선택
+  function weightedPick(pool) {
+    const weights = pool.map(n => FREQ[n]);
+    const total = weights.reduce((a, b) => a + b, 0);
+    let r = Math.random() * total;
+    for (let i = 0; i < pool.length; i++) {
+      r -= weights[i];
+      if (r <= 0) return i;
+    }
+    return pool.length - 1;
+  }
+
+  function generateNumbers() {
+    const pool = Array.from({ length: 45 }, (_, i) => i + 1);
+    const picked = [];
+    for (let i = 0; i < 7; i++) {
+      const idx = weightedPick(pool);
+      picked.push(pool.splice(idx, 1)[0]);
+    }
+    const main = picked.slice(0, 6).sort((a, b) => a - b);
+    const bonus = picked[6];
+    return { main, bonus };
+  }
+
+  function generate() {
+    const btn = document.getElementById('genBtn');
+    const stage = document.getElementById('ballStage');
+
+    btn.classList.add('spinning');
+    setTimeout(() => btn.classList.remove('spinning'), 400);
+
+    let html = '';
+    for (let s = 0; s < 5; s++) {
+      const { main, bonus } = generateNumbers();
+      const rowDelay = s * 0.4;
+
+      html += `<div class="balls-row set-row" style="animation-delay:${rowDelay}s">`;
+      html += `<span class="set-label">${String.fromCharCode(65 + s)}</span>`;
+      main.forEach((num, i) => {
+        html += `<div class="ball ${getBallClass(num)} show" style="animation-delay:${rowDelay + i * 0.12}s">${num}</div>`;
+      });
+      html += `<span class="plus-sign" style="animation-delay:${rowDelay + 0.8}s">+</span>`;
+      html += `<div class="ball ${getBallClass(bonus)} bonus show" style="animation-delay:${rowDelay + 0.9}s">${bonus}</div>`;
+      html += '</div>';
+
+      addHistory(main, bonus);
+    }
+
+    stage.innerHTML = html;
+  }
+
+  function addHistory(main, bonus) {
+    historyCount++;
+    const area = document.getElementById('historyArea');
+    const list = document.getElementById('historyList');
+    area.style.display = 'block';
+
+    let html = `<div class="history-item">`;
+    html += `<span class="history-num">#${historyCount}</span>`;
+    html += `<div class="mini-balls">`;
+    main.forEach(n => {
+      html += `<div class="mini-ball" style="background:${getBallBg(n)}">${n}</div>`;
+    });
+    html += `<span class="mini-plus">+</span>`;
+    html += `<div class="mini-ball" style="background:${getBallBg(bonus)}">${bonus}</div>`;
+    html += `</div></div>`;
+
+    list.insertAdjacentHTML('afterbegin', html);
+
+    // Keep max 10
+    while (list.children.length > 10) {
+      list.removeChild(list.lastChild);
+    }
+  }
+</script>
+
+</body>
+</html>
