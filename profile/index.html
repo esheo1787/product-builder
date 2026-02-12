@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>내 프사, 남들이 보는 첫인상</title>
+<meta name="description" content="프로필 사진 인상 분석기 - 남들이 보는 내 첫인상은?">
+<meta property="og:title" content="내 프사, 남들이 보는 첫인상">
+<meta property="og:description" content="프사만으로 알 수 있는 나의 인상 리포트">
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg1: #0a0a1a;
+  --bg2: #1a1030;
+  --surface: rgba(255,255,255,0.06);
+  --surface-hover: rgba(255,255,255,0.1);
+  --border: rgba(255,255,255,0.08);
+  --primary: #667eea;
+  --primary2: #764ba2;
+  --accent: #f093fb;
+  --text: #ffffff;
+  --text-dim: #8888aa;
+  --green: #2ecc71;
+  --blue: #3498db;
+  --orange: #f39c12;
+  --red: #e74c3c;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Noto Sans KR',sans-serif;
+  background: linear-gradient(135deg, var(--bg1), var(--bg2), #0a1a2a);
+  background-size: 400% 400%;
+  animation: bgShift 20s ease infinite;
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+@keyframes bgShift {
+  0%,100%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+}
+
+/* Screens */
+.screen {
+  position: fixed; inset:0;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  opacity:0; pointer-events:none;
+  transition: opacity 0.45s ease;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  z-index: 1;
+}
+.screen.active { opacity:1; pointer-events:auto; z-index:10; }
+.screen.result-screen { justify-content: flex-start; padding-top: 40px; padding-bottom: 60px; }
+
+/* Main Screen */
+.main-icon { font-size:4rem; margin-bottom:8px; display:block; }
+.main-title {
+  font-family:'Black Han Sans',sans-serif;
+  font-size: clamp(2rem,8vw,3.2rem);
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 6px;
+}
+.main-sub { color:var(--text-dim); font-size:0.95rem; margin-bottom:36px; }
+.mode-btns { display:flex; flex-direction:column; gap:14px; width:100%; max-width:360px; }
+.mode-btn {
+  display:flex; align-items:center; gap:14px;
+  padding:18px 24px; border-radius:18px;
+  border:2px solid var(--border);
+  background: var(--surface);
+  color:var(--text); font-size:1rem; font-weight:700;
+  cursor:pointer; transition:all 0.25s;
+  text-align:left;
+  backdrop-filter: blur(10px);
+}
+.mode-btn:hover { border-color:var(--primary); background:var(--surface-hover); transform:translateY(-2px); }
+.mode-btn:active { transform:translateY(0) scale(0.98); }
+.mode-btn .btn-icon { font-size:1.8rem; }
+.mode-btn .btn-info { flex:1; }
+.mode-btn .btn-label { display:block; font-size:1.05rem; }
+.mode-btn .btn-desc { display:block; font-size:0.78rem; color:var(--text-dim); font-weight:400; margin-top:2px; }
+.privacy {
+  margin-top:28px; font-size:0.75rem; color:var(--text-dim);
+  text-align:center; line-height:1.6;
+  max-width:320px;
+}
+.privacy::before { content:"🔒 "; }
+
+/* Upload area */
+.upload-area {
+  width:100%; max-width:360px;
+  border:2px dashed rgba(255,255,255,0.15);
+  border-radius:20px; padding:48px 24px;
+  text-align:center; cursor:pointer;
+  transition:all 0.3s;
+  background: var(--surface);
+}
+.upload-area:hover, .upload-area.dragover {
+  border-color:var(--primary); background:rgba(102,126,234,0.08);
+}
+.upload-area .up-icon { font-size:3rem; display:block; margin-bottom:12px; }
+.upload-area .up-text { color:var(--text-dim); font-size:0.9rem; }
+.back-btn {
+  position:absolute; top:20px; left:20px;
+  background:none; border:none; color:var(--text-dim);
+  font-size:1.2rem; cursor:pointer; padding:8px;
+  transition:color 0.2s;
+}
+.back-btn:hover { color:var(--text); }
+
+/* Question screens */
+.q-step { font-size:0.8rem; color:var(--primary); font-weight:700; letter-spacing:2px; margin-bottom:8px; }
+.q-title {
+  font-family:'Black Han Sans',sans-serif;
+  font-size:1.6rem; margin-bottom:28px; text-align:center;
+}
+.option-grid {
+  display:grid; gap:12px; width:100%; max-width:360px;
+}
+.option-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+.option-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.option-card {
+  background:var(--surface); border:2px solid var(--border);
+  border-radius:16px; padding:20px 12px;
+  text-align:center; cursor:pointer;
+  transition:all 0.25s; color:var(--text);
+  backdrop-filter:blur(10px);
+}
+.option-card:hover { border-color:var(--primary); background:var(--surface-hover); }
+.option-card.selected {
+  border-color:var(--primary); background:rgba(102,126,234,0.2);
+  transform:scale(0.95);
+}
+.option-card .opt-emoji { font-size:2rem; display:block; margin-bottom:6px; }
+.option-card .opt-label { font-size:0.88rem; font-weight:600; }
+
+/* Loading screen */
+.loading-wrap { text-align:center; max-width:360px; }
+.loading-icon { font-size:3.5rem; display:block; margin-bottom:20px; animation:pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.1);opacity:0.7} }
+.loading-title { font-family:'Black Han Sans',sans-serif; font-size:1.4rem; margin-bottom:24px; }
+.progress-bar {
+  width:100%; height:6px; background:rgba(255,255,255,0.1);
+  border-radius:3px; overflow:hidden; margin-bottom:20px;
+}
+.progress-fill {
+  height:100%; width:0%;
+  background:linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius:3px; transition:width 0.3s;
+}
+.loading-status {
+  font-size:0.85rem; color:var(--text-dim);
+  min-height:1.4em;
+  transition:opacity 0.2s;
+}
+.loading-percent { font-family:'Black Han Sans',sans-serif; font-size:2rem; color:var(--primary); margin-bottom:16px; }
+
+/* Result screen */
+.result-container { max-width:420px; width:100%; }
+.result-grade-badge {
+  display:inline-block; padding:6px 18px;
+  border-radius:20px; font-size:0.8rem; font-weight:900;
+  letter-spacing:2px; margin-bottom:16px;
+}
+.grade-A { background:linear-gradient(135deg,#f093fb,#f5576c); color:#fff; }
+.grade-B { background:linear-gradient(135deg,#667eea,#764ba2); color:#fff; }
+.grade-C { background:linear-gradient(135deg,#ffecd2,#fcb69f); color:#333; }
+.grade-D { background:linear-gradient(135deg,#a8a8a8,#666); color:#fff; }
+.result-emoji { font-size:5rem; display:block; margin-bottom:12px; animation:resultPop 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes resultPop { from{transform:scale(0) rotate(-20deg);opacity:0} to{transform:scale(1) rotate(0);opacity:1} }
+.result-type {
+  font-family:'Black Han Sans',sans-serif;
+  font-size:clamp(1.8rem,6vw,2.4rem);
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text; margin-bottom:6px;
+}
+.result-subtitle { color:var(--text-dim); font-size:0.92rem; margin-bottom:32px; }
+
+.section-label {
+  font-size:0.72rem; font-weight:700; color:var(--text-dim);
+  letter-spacing:2px; text-transform:uppercase;
+  margin-bottom:16px; text-align:center;
+}
+.score-bars { margin-bottom:32px; }
+.score-row {
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:14px;
+}
+.score-label { width:50px; font-size:0.82rem; font-weight:700; color:var(--text-dim); text-align:right; }
+.score-bar-bg {
+  flex:1; height:10px; background:rgba(255,255,255,0.08);
+  border-radius:5px; overflow:hidden; position:relative;
+}
+.score-bar-fill {
+  height:100%; border-radius:5px; width:0%;
+  transition: width 1.2s cubic-bezier(0.25,1,0.5,1);
+}
+.score-value {
+  width:36px; font-family:'Black Han Sans',sans-serif;
+  font-size:1.1rem; text-align:left;
+}
+.fill-hogam { background:linear-gradient(90deg,#ff6b6b,#ffa07a); }
+.fill-sinloe { background:linear-gradient(90deg,#667eea,#64b5f6); }
+.fill-hip { background:linear-gradient(90deg,#f093fb,#c471ed); }
+.fill-geori { background:linear-gradient(90deg,#ffd93d,#f0932b); }
+
+.desc-section { margin-bottom:28px; }
+.desc-item {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:12px 16px; margin-bottom:8px;
+  background:var(--surface); border-radius:14px;
+  font-size:0.88rem; line-height:1.5;
+  opacity:0; transform:translateX(-10px);
+  animation:slideInLeft 0.4s ease-out forwards;
+}
+.desc-item:nth-child(1){animation-delay:0.6s}
+.desc-item:nth-child(2){animation-delay:0.8s}
+.desc-item:nth-child(3){animation-delay:1s}
+@keyframes slideInLeft { to{opacity:1;transform:translateX(0)} }
+.desc-item .arrow { color:var(--primary); font-weight:700; flex-shrink:0; }
+
+.tip-box {
+  background: rgba(102,126,234,0.1);
+  border:1px solid rgba(102,126,234,0.2);
+  border-radius:16px; padding:18px 20px;
+  margin-bottom:32px; font-size:0.88rem; line-height:1.6;
+}
+.tip-box .tip-icon { margin-right:6px; }
+
+.share-btns {
+  display:grid; grid-template-columns:1fr 1fr; gap:10px;
+  margin-bottom:12px;
+}
+.share-btn {
+  padding:14px 12px; border-radius:14px;
+  border:2px solid var(--border); background:var(--surface);
+  color:var(--text); font-size:0.85rem; font-weight:700;
+  cursor:pointer; transition:all 0.2s; text-align:center;
+}
+.share-btn:hover { border-color:var(--primary); background:var(--surface-hover); }
+.share-btn:active { transform:scale(0.97); }
+.action-btns { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+.action-btn {
+  padding:16px; border-radius:14px; border:none;
+  font-size:1rem; font-weight:700; cursor:pointer;
+  transition:all 0.2s; text-align:center;
+}
+.action-btn:hover { transform:translateY(-2px); }
+.action-btn:active { transform:translateY(0) scale(0.98); }
+.btn-retry {
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  color:#fff;
+}
+.btn-compare { background:var(--surface); border:2px solid var(--border); color:var(--text); }
+.btn-hub {
+  background:none; border:none; color:var(--text-dim);
+  font-size:0.82rem; margin-top:8px; cursor:pointer; padding:10px;
+}
+.btn-hub:hover { color:var(--text); }
+
+/* Toast */
+.toast {
+  position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(80px);
+  background:rgba(255,255,255,0.15); backdrop-filter:blur(20px);
+  padding:12px 24px; border-radius:12px; font-size:0.88rem; font-weight:600;
+  transition:transform 0.3s ease; z-index:999; pointer-events:none;
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+
+/* Confetti */
+.confetti-layer { position:fixed; inset:0; pointer-events:none; z-index:100; overflow:hidden; }
+.confetti-piece {
+  position:absolute; width:10px; height:10px;
+  top:-20px; border-radius:2px;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  0% { transform:translateY(0) rotate(0deg); opacity:1; }
+  100% { transform:translateY(110vh) rotate(720deg); opacity:0; }
+}
+
+/* Mobile */
+@media(max-width:480px) {
+  .screen { padding:20px 16px; }
+  .option-grid.cols-3 { grid-template-columns:1fr 1fr; }
+  .result-emoji { font-size:4rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- MAIN -->
+<div class="screen active" id="screenMain">
+  <span class="main-icon">🧠</span>
+  <h1 class="main-title">프사 인상 리포트</h1>
+  <p class="main-sub">남들이 보는 내 첫인상은?</p>
+  <div class="mode-btns">
+    <button class="mode-btn" onclick="startUpload()">
+      <span class="btn-icon">📷</span>
+      <span class="btn-info">
+        <span class="btn-label">사진 업로드하고 분석</span>
+        <span class="btn-desc">이미지 밝기·색감·대비를 AI처럼 분석</span>
+      </span>
+    </button>
+    <button class="mode-btn" onclick="startSelect()">
+      <span class="btn-icon">🎭</span>
+      <span class="btn-info">
+        <span class="btn-label">사진 없이 유형 선택</span>
+        <span class="btn-desc">3가지 질문으로 인상 분석</span>
+      </span>
+    </button>
+  </div>
+  <p class="privacy">이 서비스는 이미지를 서버에 업로드하지 않습니다.<br>모든 분석은 브라우저 내에서만 처리됩니다.</p>
+</div>
+
+<!-- UPLOAD -->
+<div class="screen" id="screenUpload">
+  <button class="back-btn" onclick="goMain()">← 뒤로</button>
+  <label class="upload-area" id="uploadArea" for="fileInput">
+    <span class="up-icon">📁</span>
+    <span class="up-text">사진을 선택하거나 여기에 드래그하세요</span>
+    <input type="file" id="fileInput" accept="image/*" hidden>
+  </label>
+</div>
+
+<!-- Q1 -->
+<div class="screen" id="screenQ1">
+  <button class="back-btn" onclick="goMain()">← 뒤로</button>
+  <div class="q-step">STEP 1 / 3</div>
+  <div class="q-title">프사 유형을 골라주세요</div>
+  <div class="option-grid cols-3" id="q1Grid">
+    <button class="option-card" onclick="answer('type','selfie',this)"><span class="opt-emoji">🤳</span><span class="opt-label">셀카</span></button>
+    <button class="option-card" onclick="answer('type','mirror',this)"><span class="opt-emoji">🪞</span><span class="opt-label">거울샷</span></button>
+    <button class="option-card" onclick="answer('type','travel',this)"><span class="opt-emoji">✈️</span><span class="opt-label">여행사진</span></button>
+    <button class="option-card" onclick="answer('type','group',this)"><span class="opt-emoji">👥</span><span class="opt-label">단체사진</span></button>
+    <button class="option-card" onclick="answer('type','character',this)"><span class="opt-emoji">🎨</span><span class="opt-label">애니/캐릭터</span></button>
+    <button class="option-card" onclick="answer('type','landscape',this)"><span class="opt-emoji">🏔️</span><span class="opt-label">풍경</span></button>
+  </div>
+</div>
+
+<!-- Q2 -->
+<div class="screen" id="screenQ2">
+  <button class="back-btn" onclick="showScreen('screenQ1')">← 뒤로</button>
+  <div class="q-step">STEP 2 / 3</div>
+  <div class="q-title">표정은 어때요?</div>
+  <div class="option-grid cols-2" id="q2Grid">
+    <button class="option-card" onclick="answer('expression','neutral',this)"><span class="opt-emoji">😐</span><span class="opt-label">무표정</span></button>
+    <button class="option-card" onclick="answer('expression','slight',this)"><span class="opt-emoji">🙂</span><span class="opt-label">살짝 웃음</span></button>
+    <button class="option-card" onclick="answer('expression','big',this)"><span class="opt-emoji">😄</span><span class="opt-label">활짝 웃음</span></button>
+    <button class="option-card" onclick="answer('expression','serious',this)"><span class="opt-emoji">🧐</span><span class="opt-label">진지함</span></button>
+  </div>
+</div>
+
+<!-- Q3 -->
+<div class="screen" id="screenQ3">
+  <button class="back-btn" onclick="showScreen('screenQ2')">← 뒤로</button>
+  <div class="q-step">STEP 3 / 3</div>
+  <div class="q-title">배경 느낌은?</div>
+  <div class="option-grid cols-2" id="q3Grid">
+    <button class="option-card" onclick="answer('background','clean',this)"><span class="opt-emoji">✨</span><span class="opt-label">깔끔</span></button>
+    <button class="option-card" onclick="answer('background','aesthetic',this)"><span class="opt-emoji">🌸</span><span class="opt-label">감성 필터</span></button>
+    <button class="option-card" onclick="answer('background','dark',this)"><span class="opt-emoji">🌙</span><span class="opt-label">어두움</span></button>
+    <button class="option-card" onclick="answer('background','bright',this)"><span class="opt-emoji">☀️</span><span class="opt-label">밝음</span></button>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div class="screen" id="screenLoading">
+  <div class="loading-wrap">
+    <span class="loading-icon">🧠</span>
+    <div class="loading-title">인상 분석 중...</div>
+    <div class="loading-percent" id="loadPercent">0%</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="loading-status" id="loadStatus">준비 중…</div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen result-screen" id="screenResult">
+  <div class="result-container" id="resultContainer"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+<!-- CONFETTI -->
+<div class="confetti-layer" id="confettiLayer"></div>
+
+<script>
+/* ========== CONSTANTS ========== */
+const LOADING_MSGS = [
+  "이미지 픽셀 분해 중…",
+  "얼굴 대비 패턴 스캔 중…",
+  "색온도 분석 중…",
+  "밝기 분포 매핑 중…",
+  "인상 매칭 알고리즘 적용 중…",
+  "사회적 반응 예측 중…",
+  "최종 리포트 생성 중…"
+];
+
+const SCORING = {
+  type: {
+    selfie:    {h:12, s:-5, p:3, g:-8},
+    mirror:    {h:5,  s:-8, p:15,g:-3},
+    travel:    {h:15, s:8,  p:10,g:-10},
+    group:     {h:8,  s:12, p:-5,g:-15},
+    character: {h:-5, s:-15,p:20,g:15},
+    landscape: {h:3,  s:5,  p:8, g:12}
+  },
+  expression: {
+    neutral: {h:-8, s:10, p:5,  g:15},
+    slight:  {h:10, s:8,  p:3,  g:-10},
+    big:     {h:18, s:3,  p:-5, g:-20},
+    serious: {h:-5, s:15, p:8,  g:10}
+  },
+  background: {
+    clean:     {h:5,  s:10, p:-3, g:3},
+    aesthetic: {h:-3, s:-8, p:18, g:5},
+    dark:      {h:-8, s:3,  p:12, g:10},
+    bright:    {h:12, s:5,  p:-3, g:-8}
+  }
+};
+
+const TYPES = [
+  // A Grade
+  {id:'datePass',    name:'소개팅 프리패스형', emoji:'💘', grade:'A', sub:'프사만으로 호감도 MAX',
+   desc:['프사 하나로 "만나보고 싶다" 반응을 이끌어냄','자연스러운 밝은 인상이 강한 무기','소개팅 앱에서 우측 스와이프 확률 매우 높음'],
+   tip:'지금 프사가 최적입니다. 바꾸지 마세요!'},
+  {id:'sunshine',    name:'인간 햇살형', emoji:'☀️', grade:'A', sub:'보기만 해도 기분 좋아지는 프사',
+   desc:['프사에서 따뜻한 에너지가 물리적으로 느껴짐','처음 보는 사람도 편하게 다가갈 수 있는 인상','단톡방에서 프사만으로 호감을 획득하는 타입'],
+   tip:'따뜻함을 유지하면서 조금 더 힙한 배경을 쓰면 완벽!'},
+  {id:'trustBomber', name:'신뢰 폭격기', emoji:'🛡️', grade:'A', sub:'비밀을 맡겨도 될 것 같은 인상',
+   desc:['첫인상만으로 "괜찮은 사람"이라는 평가를 받음','그룹 프로젝트할 때 리더로 뽑힐 상','진중하면서도 안정감 있는 프사의 정석'],
+   tip:'가끔 밝은 표정의 사진을 섞으면 호감도도 UP!'},
+  {id:'vibeArtist',  name:'분위기 장인', emoji:'🎨', grade:'A', sub:'감각적인 프사로 시선을 사로잡는 타입',
+   desc:['사진 한 장에서 센스가 느껴짐','피드를 스크롤하다가 멈추게 만드는 힘이 있음','호감과 힙함을 동시에 잡은 드문 케이스'],
+   tip:'지금 감성 유지하면서 표정만 살짝 더하면 최강!'},
+  {id:'hipster',     name:'감성 힙스터', emoji:'🌿', grade:'A', sub:'남들과 다른 감성이 돋보이는 프사',
+   desc:['독특한 분위기가 강한 개성으로 작용함','인스타 피드 전체가 궁금해지는 프사','창의적이고 트렌디한 인상을 줌'],
+   tip:'힙함은 충분해요. 따뜻한 톤을 더하면 호감도 급상승!'},
+  {id:'quietCharisma',name:'조용한 카리스마', emoji:'🖤', grade:'A', sub:'말 없이도 존재감이 느껴지는 프사',
+   desc:['거리감이 있지만 그게 오히려 매력으로 작용','궁금하게 만드는 미스터리한 분위기','프사 바꾸면 바로 눈치채는 사람이 많을 타입'],
+   tip:'가끔 밝은 사진으로 반전 매력을 보여주세요!'},
+
+  // B Grade
+  {id:'secretCharm', name:'은근 호감형', emoji:'💫', grade:'B', sub:'볼수록 끌리는 매력의 소유자',
+   desc:['처음엔 무난하지만 볼수록 좋아지는 타입','프사를 자세히 보면 매력 포인트가 숨어있음','실물이 더 나을 확률이 높은 인상'],
+   tip:'밝은 자연광에서 찍은 사진으로 바꾸면 호감도 +15 예상!'},
+  {id:'calmStrategist',name:'차분한 전략가', emoji:'♟️', grade:'B', sub:'계산된 듯 자연스러운 프사',
+   desc:['프사 선택에 신중함이 느껴짐','안정적이고 신뢰할 수 있는 인상을 줌','직장 동료나 선후배에게 좋은 첫인상'],
+   tip:'조금 더 자연스러운 순간을 담아보세요!'},
+  {id:'warmSenior',  name:'훈훈한 선배상', emoji:'🤝', grade:'B', sub:'믿음직하면서도 따뜻한 인상',
+   desc:['후배들이 먼저 밥 사달라고 할 것 같은 인상','편안하면서도 존경심이 생기는 프사','직장에서 인기 많은 스타일의 첫인상'],
+   tip:'살짝 미소를 더하면 소개팅에서도 통할 프사!'},
+  {id:'realFriend',  name:'현실 친구상', emoji:'🍻', grade:'B', sub:'편안하고 친근한 느낌의 프사',
+   desc:['거리감 없이 편하게 다가갈 수 있는 인상','같이 밥 먹자고 DM 보내기 쉬운 타입','실제 성격과 프사 인상이 일치할 확률 높음'],
+   tip:'배경이나 구도에 변화를 주면 임팩트 UP!'},
+  {id:'dmHesitate',  name:'말 걸기 애매형', emoji:'🤔', grade:'B', sub:'DM 보내기 전에 한 번 더 고민하게 만드는 타입',
+   desc:['호감은 가는데 먼저 다가가긴 망설여지는 인상','살짝 벽이 느껴지지만 나쁜 의미는 아님','말 걸면 의외로 잘 받아줄 것 같은 느낌도 있음'],
+   tip:'밝은 표정의 사진으로 바꾸면 접근성이 크게 올라갑니다!'},
+  {id:'safeDefault', name:'무난 안정형', emoji:'🏠', grade:'B', sub:'무난하지만 임팩트가 조금 부족한 프사',
+   desc:['거부감은 없지만 강한 인상도 남기지 않는 타입','단톡방에서 프사가 잘 기억나지 않을 수 있음','안정적이지만 특별함이 아쉬운 프사'],
+   tip:'개성 있는 배경이나 소품을 활용해보세요!'},
+
+  // C Grade
+  {id:'conceptOverload',name:'컨셉 과몰입형', emoji:'🎭', grade:'C', sub:'컨셉은 좋은데 호감도가 따라가지 못하는 타입',
+   desc:['분위기는 있는데 뭔가 과한 느낌','본인은 만족하지만 타인 시선에서는 호불호가 갈림','컨셉을 살짝만 줄이면 훨씬 나아질 잠재력'],
+   tip:'필터와 편집을 30%만 줄여보세요. 자연스러움이 답!'},
+  {id:'shyInducer',  name:'낯가림 유발형', emoji:'🙈', grade:'C', sub:'왠지 먼저 말 걸기 어려운 분위기',
+   desc:['거리감이 먼저 느껴지는 프사','실제로는 친근한 사람일 수 있지만 프사가 벽을 만듦','DM 보내기를 포기하게 만드는 아우라'],
+   tip:'미소 짓는 사진으로 바꾸면 거리감 -20 예상!'},
+  {id:'misunderstood',name:'오해받기 쉬움', emoji:'🫠', grade:'C', sub:'실제와 프사 인상이 다를 확률 높음',
+   desc:['프사가 본인의 매력을 제대로 전달하지 못하는 중','만나보면 다른 사람이라는 반응을 자주 들을 타입','사진 한 장이 주는 인상과 실제 갭이 큰 케이스'],
+   tip:'친구가 찍어준 자연스러운 사진을 써보세요!'},
+  {id:'emotionMystery',name:'감정 미스터리', emoji:'🌫️', grade:'C', sub:'무슨 생각인지 알 수 없는 프사',
+   desc:['분위기는 있는데 감정이 안 읽히는 인상','궁금하긴 한데 다가가긴 어려운 묘한 느낌','미스터리가 매력이 되려면 한 끗이 부족'],
+   tip:'눈웃음이 보이는 사진이면 미스터리+호감 동시에 가능!'},
+  {id:'pokerFace',   name:'프로 무표정러', emoji:'😶', grade:'C', sub:'감정을 숨기는 프사의 달인',
+   desc:['표정 없음이 시그니처인 타입','쿨해 보이지만 차가워 보일 수도 있음','무표정이 매력인 사람은 극소수, 대부분은 손해'],
+   tip:'살짝이라도 미소를 추가하면 호감도 대폭 상승!'},
+  {id:'distanceGen', name:'거리감 생성기', emoji:'🧊', grade:'C', sub:'접근 금지 오라를 풍기는 프사',
+   desc:['프사에서 "말 걸지 마세요" 에너지가 나옴','본인 의도와 무관하게 벽이 느껴지는 인상','친해지면 괜찮을 것 같은데 그 첫 단계가 어려움'],
+   tip:'밝은 톤 + 미소 + 자연광, 이 3개면 해결됩니다!'},
+
+  // D Grade
+  {id:'filterOverload',name:'필터 과다', emoji:'🌈', grade:'D', sub:'필터가 너무 강해서 진짜 모습이 궁금해지는 타입',
+   desc:['보정이 과해서 신뢰도가 떨어지는 인상','실제 모습과의 괴리감을 느끼게 만듦','좋은 의도지만 역효과가 나고 있는 상황'],
+   tip:'필터를 빼고 자연광에서 한 장 찍어보세요. 훨씬 좋을 거예요!'},
+  {id:'bgChaos',     name:'배경 혼잡러', emoji:'🗑️', grade:'D', sub:'배경에 시선을 빼앗겨 본인이 안 보이는 프사',
+   desc:['주인공보다 배경이 먼저 눈에 들어옴','정리되지 않은 배경이 인상 점수를 깎고 있음','본인은 괜찮은데 프사가 발목을 잡는 케이스'],
+   tip:'깔끔한 배경 앞에서 다시 찍어보세요!'},
+  {id:'noLight',     name:'조명 실종형', emoji:'🕯️', grade:'D', sub:'어둠 속에 숨어버린 프사',
+   desc:['너무 어두워서 인상을 파악하기 어려움','어둠이 분위기가 아니라 그냥 안 보이는 수준','밝기만 올려도 인상이 완전히 달라질 잠재력'],
+   tip:'자연광이 드는 창가에서 한 장만 찍어보세요!'},
+  {id:'tooFar',      name:'너무 멀리 있음', emoji:'🔭', grade:'D', sub:'확대해도 잘 안 보이는 프사',
+   desc:['본인이 너무 작게 나와서 인상 파악 불가','풍경 사진인지 프사인지 구분이 어려움','좋은 장소인건 알겠는데 주인공이 안 보임'],
+   tip:'상반신이 잘 보이는 거리에서 찍어보세요!'},
+  {id:'angleMiss',   name:'각도 미스', emoji:'📐', grade:'D', sub:'좋은 소재, 아쉬운 각도',
+   desc:['각도 때문에 실제보다 인상이 안 좋게 나옴','약간만 바꿔도 훨씬 나아질 잠재력이 큼','셀카라면 눈높이에서 살짝 위가 정답'],
+   tip:'눈높이보다 10~15도 위에서 찍으면 인상 급상승!'},
+  {id:'frozenFace',  name:'표정 봉인형', emoji:'🗿', grade:'D', sub:'표정이 실종된 프사',
+   desc:['증명사진 같은 느낌이 강한 프사','감정이 전혀 전달되지 않는 인상','프사가 본인의 매력을 100% 숨기고 있는 상태'],
+   tip:'거울 앞에서 미소 연습 후 셀카 한 장! 반전이 올 거예요.'}
+];
+
+/* ========== STATE ========== */
+let state = { mode:null, answers:{}, scores:null, resultType:null };
+
+/* ========== SCREEN NAV ========== */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  el.scrollTop = 0;
+  requestAnimationFrame(() => el.classList.add('active'));
+}
+function goMain() {
+  state = {mode:null, answers:{}, scores:null, resultType:null};
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  showScreen('screenMain');
+}
+
+/* ========== UPLOAD MODE ========== */
+function startUpload() {
+  state.mode = 'upload';
+  showScreen('screenUpload');
+}
+
+const fileInput = document.getElementById('fileInput');
+const uploadArea = document.getElementById('uploadArea');
+
+uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+uploadArea.addEventListener('drop', e => {
+  e.preventDefault(); uploadArea.classList.remove('dragover');
+  if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', () => { if(fileInput.files[0]) handleFile(fileInput.files[0]); });
+
+function handleFile(file) {
+  if(!file.type.startsWith('image/')) { showToast('이미지 파일을 선택해주세요!'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = new Image();
+    img.onload = () => {
+      const scores = analyzeImage(img);
+      state.scores = scores;
+      startLoading();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function analyzeImage(img) {
+  const canvas = document.createElement('canvas');
+  const size = 200;
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, size, size);
+  const data = ctx.getImageData(0, 0, size, size).data;
+  const n = data.length / 4;
+  let tR=0,tG=0,tB=0,tL=0;
+  const lums = [];
+  for(let i=0;i<data.length;i+=4){
+    const r=data[i],g=data[i+1],b=data[i+2];
+    tR+=r; tG+=g; tB+=b;
+    const l = 0.299*r + 0.587*g + 0.114*b;
+    tL+=l; lums.push(l);
+  }
+  const avgL = tL/n;
+  const brightness = avgL / 255;
+  const variance = lums.reduce((s,l) => s + (l-avgL)**2, 0) / n;
+  const contrast = Math.sqrt(variance) / 128;
+  const warmth = ((tR/n) - (tB/n)) / 255;
+  const rand = () => Math.random()*10 - 5;
+
+  const clamp = v => Math.max(20, Math.min(92, Math.round(v)));
+  return {
+    hogam:  clamp(50 + brightness*30 + warmth*15 + rand()),
+    sinloe: clamp(50 + contrast*20 + brightness*10 + rand()),
+    hip:    clamp(50 + (1-brightness)*15 + contrast*15 + rand()),
+    geori:  clamp(50 - brightness*20 - warmth*15 + contrast*10 + rand())
+  };
+}
+
+/* ========== SELECT MODE ========== */
+function startSelect() {
+  state.mode = 'select';
+  showScreen('screenQ1');
+}
+
+function answer(q, val, el) {
+  state.answers[q] = val;
+  el.closest('.option-grid').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  setTimeout(() => {
+    if(q==='type') showScreen('screenQ2');
+    else if(q==='expression') showScreen('screenQ3');
+    else if(q==='background') {
+      state.scores = calcSelectScores();
+      startLoading();
+    }
+  }, 280);
+}
+
+function calcSelectScores() {
+  let h=50, s=50, p=50, g=50;
+  for(const [cat, val] of Object.entries(state.answers)) {
+    const mod = SCORING[cat]?.[val];
+    if(mod) { h+=mod.h; s+=mod.s; p+=mod.p; g+=mod.g; }
+  }
+  const rand = () => Math.random()*10 - 5;
+  const clamp = v => Math.max(20, Math.min(92, Math.round(v)));
+  return { hogam:clamp(h+rand()), sinloe:clamp(s+rand()), hip:clamp(p+rand()), geori:clamp(g+rand()) };
+}
+
+/* ========== LOADING ========== */
+function startLoading() {
+  showScreen('screenLoading');
+  const fill = document.getElementById('progressFill');
+  const pct = document.getElementById('loadPercent');
+  const status = document.getElementById('loadStatus');
+  let progress = 0;
+  let msgIdx = 0;
+  fill.style.width = '0%';
+
+  const interval = setInterval(() => {
+    progress += Math.random()*8 + 3;
+    if(progress > 98) progress = 98;
+    fill.style.width = progress + '%';
+    pct.textContent = Math.round(progress) + '%';
+    if(Math.random() < 0.35 && msgIdx < LOADING_MSGS.length) {
+      status.textContent = LOADING_MSGS[msgIdx++];
+    }
+  }, 200);
+
+  setTimeout(() => {
+    clearInterval(interval);
+    fill.style.width = '100%';
+    pct.textContent = '100%';
+    status.textContent = '분석 완료!';
+    setTimeout(() => {
+      state.resultType = determineType(state.scores);
+      showResult();
+    }, 400);
+  }, 3000);
+}
+
+/* ========== TYPE DETERMINATION ========== */
+function determineType(sc) {
+  const eff = (sc.hogam + sc.sinloe + sc.hip + (100-sc.geori)) / 4;
+  let grade;
+  if(eff>=72) grade='A';
+  else if(eff>=58) grade='B';
+  else if(eff>=42) grade='C';
+  else grade='D';
+
+  const gt = TYPES.filter(t => t.grade === grade);
+  const metrics = [{k:'hogam',v:sc.hogam},{k:'sinloe',v:sc.sinloe},{k:'hip',v:sc.hip},{k:'geori',v:sc.geori}];
+  metrics.sort((a,b)=>b.v-a.v);
+  const dom = metrics[0].k;
+  const range = metrics[0].v - metrics[3].v;
+
+  if(grade==='A') {
+    if(dom==='hogam' && sc.hogam>=80) return gt.find(t=>t.id==='datePass') || gt[0];
+    if(dom==='hogam' && sc.geori<=35) return gt.find(t=>t.id==='sunshine') || gt[0];
+    if(dom==='sinloe') return gt.find(t=>t.id==='trustBomber') || gt[0];
+    if(dom==='hip' && sc.hogam>=65) return gt.find(t=>t.id==='vibeArtist') || gt[0];
+    if(dom==='hip') return gt.find(t=>t.id==='hipster') || gt[0];
+    return gt.find(t=>t.id==='quietCharisma') || gt[0];
+  }
+  if(grade==='B') {
+    if(dom==='sinloe' && sc.hogam>=60) return gt.find(t=>t.id==='warmSenior') || gt[0];
+    if(dom==='hogam') return gt.find(t=>t.id==='secretCharm') || gt[0];
+    if(dom==='sinloe') return gt.find(t=>t.id==='calmStrategist') || gt[0];
+    if(dom==='geori') return gt.find(t=>t.id==='dmHesitate') || gt[0];
+    if(range<=15) return gt.find(t=>t.id==='realFriend') || gt[0];
+    return gt.find(t=>t.id==='safeDefault') || gt[0];
+  }
+  if(grade==='C') {
+    if(dom==='hip' && sc.hip>=65) return gt.find(t=>t.id==='conceptOverload') || gt[0];
+    if(dom==='geori' && sc.geori>=70) return gt.find(t=>t.id==='distanceGen') || gt[0];
+    if(dom==='geori') return gt.find(t=>t.id==='shyInducer') || gt[0];
+    if(range>=30) return gt.find(t=>t.id==='misunderstood') || gt[0];
+    if(dom==='hip') return gt.find(t=>t.id==='emotionMystery') || gt[0];
+    return gt.find(t=>t.id==='pokerFace') || gt[0];
+  }
+  // D
+  if(sc.hip > sc.hogam + 15) return gt.find(t=>t.id==='filterOverload') || gt[0];
+  if(dom==='geori') return gt.find(t=>t.id==='tooFar') || gt[0];
+  if(sc.hogam<=30) return gt.find(t=>t.id==='noLight') || gt[0];
+  if(sc.sinloe<=30) return gt.find(t=>t.id==='angleMiss') || gt[0];
+  if(sc.hogam<=40 && sc.geori>=60) return gt.find(t=>t.id==='frozenFace') || gt[0];
+  return gt.find(t=>t.id==='bgChaos') || gt[0];
+}
+
+/* ========== RESULT RENDER ========== */
+function showResult() {
+  const sc = state.scores;
+  const type = state.resultType;
+  const gradeClass = 'grade-' + type.grade;
+
+  document.getElementById('resultContainer').innerHTML = `
+    <div style="text-align:center">
+      <span class="result-grade-badge ${gradeClass}">${type.grade} GRADE</span>
+      <span class="result-emoji">${type.emoji}</span>
+      <div class="result-type">${type.name}</div>
+      <div class="result-subtitle">${type.sub}</div>
+    </div>
+
+    <div class="section-label" style="margin-top:8px">분석 결과</div>
+    <div class="score-bars">
+      <div class="score-row">
+        <span class="score-label">호감도</span>
+        <div class="score-bar-bg"><div class="score-bar-fill fill-hogam" id="barHogam"></div></div>
+        <span class="score-value" id="valHogam">0</span>
+      </div>
+      <div class="score-row">
+        <span class="score-label">신뢰감</span>
+        <div class="score-bar-bg"><div class="score-bar-fill fill-sinloe" id="barSinloe"></div></div>
+        <span class="score-value" id="valSinloe">0</span>
+      </div>
+      <div class="score-row">
+        <span class="score-label">힙함</span>
+        <div class="score-bar-bg"><div class="score-bar-fill fill-hip" id="barHip"></div></div>
+        <span class="score-value" id="valHip">0</span>
+      </div>
+      <div class="score-row">
+        <span class="score-label">거리감</span>
+        <div class="score-bar-bg"><div class="score-bar-fill fill-geori" id="barGeori"></div></div>
+        <span class="score-value" id="valGeori">0</span>
+      </div>
+    </div>
+
+    <div class="section-label">남들이 보기엔</div>
+    <div class="desc-section">
+      ${type.desc.map(d => `<div class="desc-item"><span class="arrow">→</span><span>${d}</span></div>`).join('')}
+    </div>
+
+    <div class="tip-box">
+      <span class="tip-icon">💡</span> <strong>개선 팁</strong><br>${type.tip}
+    </div>
+
+    <div class="section-label">공유하기</div>
+    <div class="share-btns">
+      <button class="share-btn" onclick="downloadCard(1080,1920)">📱 스토리용 저장</button>
+      <button class="share-btn" onclick="downloadCard(1080,1080)">📸 피드용 저장</button>
+    </div>
+    <div class="share-btns">
+      <button class="share-btn" onclick="copyLink()">🔗 링크 복사</button>
+      <button class="share-btn" onclick="copyLink()">👥 친구랑 비교하기</button>
+    </div>
+
+    <div class="action-btns">
+      <button class="action-btn btn-retry" onclick="goMain()">🔄 다시 하기</button>
+      <button class="btn-hub" onclick="location.href='../'">← 다른 프로젝트 보기</button>
+    </div>
+  `;
+
+  showScreen('screenResult');
+
+  // Animate score bars
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      animateBar('barHogam','valHogam', sc.hogam);
+      animateBar('barSinloe','valSinloe', sc.sinloe);
+      animateBar('barHip','valHip', sc.hip);
+      animateBar('barGeori','valGeori', sc.geori);
+    }, 200);
+  });
+
+  // Confetti for A grade
+  if(type.grade === 'A') setTimeout(fireConfetti, 600);
+}
+
+function animateBar(barId, valId, target) {
+  const bar = document.getElementById(barId);
+  const val = document.getElementById(valId);
+  bar.style.width = target + '%';
+  // Count up number
+  let cur = 0;
+  const step = Math.max(1, Math.floor(target / 30));
+  const timer = setInterval(() => {
+    cur += step;
+    if(cur >= target) { cur = target; clearInterval(timer); }
+    val.textContent = cur;
+  }, 30);
+}
+
+/* ========== CONFETTI ========== */
+function fireConfetti() {
+  const layer = document.getElementById('confettiLayer');
+  layer.innerHTML = '';
+  const colors = ['#667eea','#f093fb','#f5576c','#ffd93d','#2ecc71','#3498db','#ff6b6b'];
+  for(let i=0;i<60;i++){
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left = Math.random()*100 + '%';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.animationDuration = (2 + Math.random()*2) + 's';
+    el.style.animationDelay = Math.random()*0.5 + 's';
+    el.style.width = (6 + Math.random()*8) + 'px';
+    el.style.height = (6 + Math.random()*8) + 'px';
+    layer.appendChild(el);
+  }
+  setTimeout(() => layer.innerHTML = '', 5000);
+}
+
+/* ========== SHARE CARD ========== */
+function downloadCard(w, h) {
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  const ctx = canvas.getContext('2d');
+  const sc = state.scores;
+  const type = state.resultType;
+  const isStory = h > w;
+
+  // Background gradient
+  const grad = ctx.createLinearGradient(0,0,w,h);
+  grad.addColorStop(0,'#0a0a2e');
+  grad.addColorStop(0.5,'#1a1040');
+  grad.addColorStop(1,'#0a1a3e');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0,0,w,h);
+
+  // Decorative circles
+  ctx.globalAlpha = 0.06;
+  ctx.fillStyle = '#667eea';
+  ctx.beginPath(); ctx.arc(w*0.8, h*0.15, w*0.4, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#f093fb';
+  ctx.beginPath(); ctx.arc(w*0.2, h*0.85, w*0.3, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  const cx = w/2;
+  const scale = w / 1080;
+
+  if(isStory) {
+    // Story layout
+    ctx.fillStyle = '#888';
+    ctx.font = `${28*scale}px "Noto Sans KR",sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('남들이 보는 내 첫인상은?', cx, 180*scale);
+
+    ctx.font = `${120*scale}px serif`;
+    ctx.fillText(type.emoji, cx, 450*scale);
+
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${72*scale}px "Black Han Sans","Noto Sans KR",sans-serif`;
+    ctx.fillText(type.name, cx, 600*scale);
+
+    ctx.fillStyle = '#aaa';
+    ctx.font = `${32*scale}px "Noto Sans KR",sans-serif`;
+    ctx.fillText(type.sub, cx, 680*scale);
+
+    // Score bars
+    const barY = 820*scale;
+    const barW = 600*scale;
+    const barH = 24*scale;
+    const barX = (w - barW) / 2;
+    const gap = 90*scale;
+    const labels = ['호감도','신뢰감','힙함','거리감'];
+    const vals = [sc.hogam, sc.sinloe, sc.hip, sc.geori];
+    const barColors = ['#ff6b6b','#667eea','#f093fb','#ffd93d'];
+
+    labels.forEach((label, i) => {
+      const y = barY + i * gap;
+      ctx.fillStyle = '#888';
+      ctx.font = `bold ${28*scale}px "Noto Sans KR",sans-serif`;
+      ctx.textAlign = 'left';
+      ctx.fillText(label, barX, y);
+
+      ctx.fillStyle = '#fff';
+      ctx.font = `bold ${36*scale}px "Black Han Sans","Noto Sans KR",sans-serif`;
+      ctx.textAlign = 'right';
+      ctx.fillText(vals[i], barX + barW, y);
+
+      const by = y + 12*scale;
+      ctx.fillStyle = 'rgba(255,255,255,0.1)';
+      roundRect(ctx, barX, by, barW, barH, barH/2);
+      ctx.fillStyle = barColors[i];
+      roundRect(ctx, barX, by, barW * vals[i]/100, barH, barH/2);
+    });
+
+    // CTA
+    ctx.fillStyle = '#666';
+    ctx.font = `${28*scale}px "Noto Sans KR",sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('너도 해보고 결과 공유해봐 👀', cx, 1600*scale);
+
+    ctx.fillStyle = '#555';
+    ctx.font = `${24*scale}px "Noto Sans KR",sans-serif`;
+    ctx.fillText('🧠 프사 인상 리포트', cx, 1700*scale);
+
+  } else {
+    // Feed layout (square)
+    ctx.fillStyle = '#888';
+    ctx.font = `${24*scale}px "Noto Sans KR",sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('남들이 보는 내 첫인상은?', cx, 100*scale);
+
+    ctx.font = `${90*scale}px serif`;
+    ctx.fillText(type.emoji, cx, 280*scale);
+
+    ctx.fillStyle = '#fff';
+    ctx.font = `bold ${64*scale}px "Black Han Sans","Noto Sans KR",sans-serif`;
+    ctx.fillText(type.name, cx, 400*scale);
+
+    ctx.fillStyle = '#aaa';
+    ctx.font = `${26*scale}px "Noto Sans KR",sans-serif`;
+    ctx.fillText(type.sub, cx, 460*scale);
+
+    // Scores in 2x2 grid
+    const labels = ['호감도','신뢰감','힙함','거리감'];
+    const vals = [sc.hogam, sc.sinloe, sc.hip, sc.geori];
+    const positions = [[w*0.28,600*scale],[w*0.72,600*scale],[w*0.28,740*scale],[w*0.72,740*scale]];
+    const barColors = ['#ff6b6b','#667eea','#f093fb','#ffd93d'];
+
+    positions.forEach(([px,py], i) => {
+      ctx.fillStyle = barColors[i];
+      ctx.font = `bold ${56*scale}px "Black Han Sans","Noto Sans KR",sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(vals[i], px, py);
+      ctx.fillStyle = '#888';
+      ctx.font = `${24*scale}px "Noto Sans KR",sans-serif`;
+      ctx.fillText(labels[i], px, py + 36*scale);
+    });
+
+    ctx.fillStyle = '#666';
+    ctx.font = `${24*scale}px "Noto Sans KR",sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('너도 해보고 결과 공유해봐 👀', cx, 920*scale);
+
+    ctx.fillStyle = '#555';
+    ctx.font = `${22*scale}px "Noto Sans KR",sans-serif`;
+    ctx.fillText('🧠 프사 인상 리포트', cx, 980*scale);
+  }
+
+  // Download
+  const link = document.createElement('a');
+  link.download = `프사인상리포트_${isStory?'스토리':'피드'}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('이미지가 저장되었습니다!');
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  if(w <= 0) return;
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+  ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+  ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+  ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y);
+  ctx.closePath();
+  ctx.fill();
+}
+
+/* ========== UTILS ========== */
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href).then(() => {
+    showToast('링크가 복사되었습니다! 친구에게 공유해보세요');
+  }).catch(() => {
+    showToast('링크를 복사하지 못했습니다');
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
