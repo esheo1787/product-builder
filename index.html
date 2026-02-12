@@ -1,14 +1,25 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+  <title>Product Builder</title>
+  <link href="style.css" rel="stylesheet">
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+  <header>
+    <h1>Product Builder</h1>
+    <button id="theme-toggle" aria-label="테마 전환">
+      <span class="icon-sun">&#9728;</span>
+      <span class="icon-moon">&#9790;</span>
+    </button>
+  </header>
+  <main>
+    <section class="hero">
+      <h2>Welcome!</h2>
+      <p>다크모드 / 라이트모드를 전환해보세요.</p>
+    </section>
+  </main>
+  <script defer src="main.js"></script>
 </body>
 </html>
