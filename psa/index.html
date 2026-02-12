@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>내 프사, 남들이 보는 첫인상 | 프사 인상 리포트</title>
+<meta name="description" content="프로필 사진 한 장으로 보는 내 첫인상 분석 — 호감도, 신뢰감, 힙함, 거리감을 AI가 분석합니다. 사진 업로드 + 유형 선택으로 정밀 진단!">
+
+<!-- OG (카카오톡, 페이스북) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="🧠 내 프사, 남들이 보는 첫인상">
+<meta property="og:description" content="프사 한 장으로 호감도·신뢰감·힙함 분석 — 너도 해보고 결과 공유해봐 👀">
+<meta property="og:image" content="https://product-builder-1h4.pages.dev/psa/og-image.png">
+<meta property="og:url" content="https://product-builder-1h4.pages.dev/psa/">
+<meta property="og:site_name" content="프사 인상 리포트">
+<meta property="og:locale" content="ko_KR">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="🧠 내 프사, 남들이 보는 첫인상">
+<meta name="twitter:description" content="프사 한 장으로 호감도·신뢰감·힙함 분석 — 너도 해보고 결과 공유해봐 👀">
+<meta name="twitter:image" content="https://product-builder-1h4.pages.dev/psa/og-image.png">
+
+<!-- Favicon -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0b0b10;
+  --surface: #141420;
+  --card: #1a1a2e;
+  --card-hover: #20203a;
+  --accent: #a78bfa;
+  --accent2: #818cf8;
+  --accent3: #c084fc;
+  --pink: #f472b6;
+  --cyan: #22d3ee;
+  --green: #34d399;
+  --amber: #fbbf24;
+  --text: #e8e8f0;
+  --dim: #6b6b8a;
+  --border: rgba(167,139,250,0.1);
+  --glow: rgba(167,139,250,0.15);
+  --radius: 16px;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Background ── */
+.bg-mesh {
+  position: fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(ellipse 600px 400px at 20% 20%, rgba(167,139,250,0.06), transparent),
+    radial-gradient(ellipse 500px 500px at 80% 70%, rgba(244,114,182,0.05), transparent),
+    radial-gradient(ellipse 400px 300px at 50% 50%, rgba(34,211,238,0.03), transparent);
+}
+.noise {
+  position:fixed; inset:0; z-index:0; pointer-events:none; opacity:0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+}
+
+/* ── Container ── */
+.wrap {
+  position: relative; z-index:1;
+  max-width: 480px; margin: 0 auto;
+  padding: 0 20px;
+  min-height: 100vh;
+}
+
+/* ── Screens ── */
+.screen { display:none; }
+.screen.active { display:block; animation: fadeUp 0.5s ease; }
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(24px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* ── Main Screen ── */
+.main-screen { padding: 80px 0 60px; text-align:center; }
+.logo-icon {
+  width: 72px; height: 72px;
+  background: linear-gradient(135deg, var(--accent), var(--pink));
+  border-radius: 22px;
+  display: inline-flex; align-items:center; justify-content:center;
+  font-size: 32px;
+  margin-bottom: 28px;
+  box-shadow: 0 8px 32px rgba(167,139,250,0.2);
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%,100% { transform:translateY(0); }
+  50% { transform:translateY(-8px); }
+}
+.main-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #fff, var(--accent3));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.main-sub {
+  font-size: 0.95rem;
+  color: var(--dim);
+  margin-bottom: 48px;
+  line-height: 1.6;
+}
+
+.mode-btn {
+  width: 100%;
+  padding: 20px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex; align-items:center; gap:14px;
+  transition: all 0.3s;
+  margin-bottom: 14px;
+  text-align: left;
+  font-family: inherit;
+}
+.mode-btn:hover {
+  background: var(--card-hover);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(167,139,250,0.12);
+}
+.mode-btn .icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex; align-items:center; justify-content:center;
+  font-size: 22px;
+  flex-shrink:0;
+}
+.mode-btn:first-of-type .icon { background: rgba(167,139,250,0.12); }
+.mode-btn:last-of-type .icon { background: rgba(244,114,182,0.12); }
+.mode-btn .label { font-size: 0.82rem; color: var(--dim); font-weight:400; margin-top:2px; }
+
+.trust-badge {
+  margin-top: 36px;
+  display: inline-flex; align-items:center; gap:8px;
+  font-size: 0.75rem;
+  color: var(--dim);
+  background: rgba(255,255,255,0.03);
+  padding: 10px 18px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+
+/* ── Upload Screen ── */
+.upload-screen { padding: 60px 0; }
+.back-btn {
+  background: none; border:none; color:var(--dim);
+  font-size: 0.85rem; cursor:pointer;
+  display: flex; align-items:center; gap:6px;
+  margin-bottom: 32px;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+.back-btn:hover { color:var(--text); }
+
+.upload-zone {
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: 360px;
+  border: 2px dashed rgba(167,139,250,0.2);
+  border-radius: var(--radius);
+  display: flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: var(--card);
+  position: relative;
+  overflow: hidden;
+}
+.upload-zone:hover {
+  border-color: var(--accent);
+  background: var(--card-hover);
+}
+.upload-zone.has-image { border-style:solid; border-color:var(--accent); }
+.upload-zone img {
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  border-radius: 14px;
+}
+.upload-zone .overlay {
+  position:relative; z-index:2;
+  text-align:center;
+}
+.upload-zone.has-image .overlay {
+  background: rgba(0,0,0,0.5);
+  padding: 20px;
+  border-radius: 12px;
+}
+.upload-icon { font-size:40px; margin-bottom:4px; }
+.upload-text { font-size:0.9rem; color:var(--dim); }
+.upload-hint { font-size:0.75rem; color:rgba(107,107,138,0.6); margin-top:4px; }
+
+.analyze-btn {
+  width: 100%;
+  padding: 18px;
+  margin-top: 24px;
+  border: none;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.3s;
+  opacity: 0.4;
+  pointer-events: none;
+}
+.analyze-btn.ready {
+  opacity: 1;
+  pointer-events: auto;
+}
+.analyze-btn.ready:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(167,139,250,0.3);
+}
+
+/* ── Select Screen ── */
+.select-screen { padding: 60px 0 40px; }
+.q-progress {
+  display: flex; gap:6px; margin-bottom: 32px;
+}
+.q-dot {
+  flex:1; height:4px;
+  border-radius:2px;
+  background: rgba(255,255,255,0.06);
+  transition: background 0.4s;
+}
+.q-dot.done { background: var(--accent); }
+.q-dot.current { background: linear-gradient(90deg, var(--accent), var(--accent3)); }
+
+.q-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.q-sub {
+  font-size: 0.82rem;
+  color: var(--dim);
+  margin-bottom: 28px;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.options-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.opt-btn {
+  padding: 18px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--text);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.25s;
+  font-family: inherit;
+}
+.opt-btn:hover {
+  border-color: var(--accent);
+  background: var(--card-hover);
+  transform: translateY(-2px);
+}
+.opt-btn .opt-icon { font-size: 1.5rem; margin-bottom: 8px; }
+
+/* ── Loading Screen ── */
+.loading-screen {
+  padding: 80px 0; text-align:center;
+  display:none;
+}
+.loading-screen.active { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:80vh; }
+
+.loading-thumb {
+  width: 100px; height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--accent);
+  margin-bottom: 32px;
+  box-shadow: 0 0 40px rgba(167,139,250,0.2);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%,100% { box-shadow: 0 0 20px rgba(167,139,250,0.2); }
+  50% { box-shadow: 0 0 50px rgba(167,139,250,0.4); }
+}
+.loading-icon-placeholder {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--pink));
+  display: flex; align-items:center; justify-content:center;
+  font-size: 36px;
+  margin-bottom: 32px;
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.loading-step {
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-bottom: 24px;
+  min-height: 24px;
+  transition: opacity 0.3s;
+}
+.progress-bar {
+  width: 240px;
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--accent), var(--pink));
+  border-radius: 2px;
+  transition: width 0.15s linear;
+}
+.progress-pct {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.8rem;
+  color: var(--dim);
+}
+
+/* ── Result Screen ── */
+.result-screen { padding: 40px 0 80px; }
+.result-screen.active { animation: fadeUp 0.6s ease; }
+
+.result-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  letter-spacing: 0.5px;
+}
+.grade-A { background: rgba(167,139,250,0.15); color: var(--accent); border: 1px solid rgba(167,139,250,0.2); }
+.grade-B { background: rgba(34,211,238,0.1); color: var(--cyan); border: 1px solid rgba(34,211,238,0.15); }
+.grade-C { background: rgba(251,191,36,0.1); color: var(--amber); border: 1px solid rgba(251,191,36,0.15); }
+.grade-D { background: rgba(244,114,182,0.1); color: var(--pink); border: 1px solid rgba(244,114,182,0.15); }
+
+.result-type-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  background: linear-gradient(135deg, #fff, var(--accent3));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.result-oneliner {
+  font-size: 0.9rem;
+  color: var(--dim);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+/* Score bars */
+.scores-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.score-row {
+  margin-bottom: 18px;
+}
+.score-row:last-child { margin-bottom:0; }
+.score-label {
+  display: flex; justify-content:space-between; align-items:center;
+  margin-bottom: 8px;
+}
+.score-name { font-size:0.85rem; font-weight:600; }
+.score-val { font-family:'Outfit',sans-serif; font-size:0.9rem; font-weight:700; }
+.score-bar {
+  height: 8px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  width: 0%;
+  transition: width 1.2s cubic-bezier(0.22,1,0.36,1);
+}
+.bar-likeable { background: linear-gradient(90deg, var(--accent), var(--accent3)); }
+.bar-trust { background: linear-gradient(90deg, var(--cyan), #06b6d4); }
+.bar-hip { background: linear-gradient(90deg, var(--pink), #e879f9); }
+.bar-distance { background: linear-gradient(90deg, var(--amber), #f97316); }
+
+/* Insight cards */
+.insight-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 14px;
+}
+.insight-card .insight-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 10px;
+  display: flex; align-items:center; gap:6px;
+}
+.insight-card p {
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: rgba(232,232,240,0.85);
+}
+.insight-card .highlight {
+  color: var(--accent3);
+  font-weight: 600;
+}
+
+/* Tip card */
+.tip-card {
+  background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(244,114,182,0.06));
+  border: 1px solid rgba(167,139,250,0.12);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 28px;
+}
+.tip-card .tip-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--green);
+  margin-bottom: 10px;
+}
+.tip-card p { font-size:0.88rem; line-height:1.7; color:rgba(232,232,240,0.8); }
+
+/* Action buttons */
+.action-btns {
+  display: flex; flex-direction:column; gap:10px;
+  margin-top: 20px;
+}
+.share-btn {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.3s;
+  display: flex; align-items:center; justify-content:center; gap:8px;
+}
+.share-btn.kakao {
+  background: #FEE500;
+  color: #191919;
+}
+.share-btn.kakao:hover { box-shadow: 0 8px 32px rgba(254,229,0,0.25); transform:translateY(-2px); }
+.share-btn.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent3));
+  color: #fff;
+}
+.share-btn.primary:hover { box-shadow: 0 8px 32px rgba(167,139,250,0.25); transform:translateY(-2px); }
+.share-btn.secondary {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.share-btn.secondary:hover { border-color:var(--accent); }
+.retry-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--dim);
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-family: inherit;
+  margin-top: 8px;
+}
+.retry-btn:hover { color:var(--text); }
+
+/* Canvas hidden */
+#analyzeCanvas { display:none; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%; transform:translateX(-50%) translateY(80px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 14px 28px;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  z-index: 1000;
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.22,1,0.36,1);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Scroll anim */
+.anim-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.22,1,0.36,1);
+}
+.anim-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 400px) {
+  .main-title { font-size:1.6rem; }
+  .result-type-name { font-size:1.6rem; }
+  .options-grid { gap:8px; }
+  .opt-btn { padding:14px 10px; font-size:0.82rem; }
+}
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="noise"></div>
+
+<div class="wrap">
+
+  <!-- ═══════ MAIN ═══════ -->
+  <div id="mainScreen" class="screen active main-screen">
+    <div class="logo-icon">🧠</div>
+    <h1 class="main-title">내 프사,<br>남들이 보는 첫인상</h1>
+    <p class="main-sub">프로필 사진 하나로<br>호감도 · 신뢰감 · 힙함을 분석합니다</p>
+
+    <button class="mode-btn" onclick="startUpload()">
+      <div class="icon">📷</div>
+      <div>
+        <div>사진 업로드 + 유형 선택</div>
+        <div class="label">사진 분석 + 질문으로 정밀 진단</div>
+      </div>
+    </button>
+    <button class="mode-btn" onclick="startSelect()">
+      <div class="icon">🎭</div>
+      <div>
+        <div>사진 없이 유형 선택</div>
+        <div class="label">3가지 질문으로 간편 진단</div>
+      </div>
+    </button>
+
+    <div class="trust-badge">🔒 사진은 서버에 저장되지 않습니다 · 브라우저 내 분석</div>
+  </div>
+
+  <!-- ═══════ UPLOAD ═══════ -->
+  <div id="uploadScreen" class="screen upload-screen">
+    <button class="back-btn" onclick="goMain()">← 돌아가기</button>
+
+    <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+      <div class="overlay">
+        <div class="upload-icon">📷</div>
+        <div class="upload-text">프로필 사진을 선택하세요</div>
+        <div class="upload-hint">탭하여 갤러리에서 선택</div>
+      </div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(this)">
+
+    <button class="analyze-btn" id="analyzeBtn" onclick="analyzePhoto()">사진 분석 후 질문으로 →</button>
+  </div>
+
+  <!-- ═══════ SELECT ═══════ -->
+  <div id="selectScreen" class="screen select-screen">
+    <button class="back-btn" onclick="goMain()">← 돌아가기</button>
+    <div class="q-progress" id="qProgress"></div>
+    <div id="questionArea"></div>
+  </div>
+
+  <!-- ═══════ LOADING ═══════ -->
+  <div id="loadingScreen" class="screen loading-screen">
+    <div id="loadingThumbWrap"></div>
+    <div class="loading-step" id="loadingStep">분석 준비 중…</div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-pct" id="progressPct">0%</div>
+  </div>
+
+  <!-- ═══════ RESULT ═══════ -->
+  <div id="resultScreen" class="screen result-screen">
+    <div id="resultContent"></div>
+  </div>
+
+</div>
+
+<canvas id="analyzeCanvas"></canvas>
+<canvas id="shareCanvas" style="display:none"></canvas>
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════
+//  STATE
+// ══════════════════════════════
+let mode = ''; // 'upload' | 'select'
+let uploadedImage = null;
+let uploadedDataURL = null;
+let selectAnswers = {};
+let currentQ = 0;
+let photoScores = null; // stores photo analysis scores for combined mode
+
+// ══════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function goMain() { showScreen('mainScreen'); mode=''; currentQ=0; selectAnswers={}; photoScores=null; }
+
+function startUpload() { mode='upload'; showScreen('uploadScreen'); }
+function startSelect() { mode='select'; currentQ=0; selectAnswers={}; showScreen('selectScreen'); renderQuestion(); }
+
+// ══════════════════════════════
+//  UPLOAD MODE
+// ══════════════════════════════
+function handleFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    uploadedDataURL = e.target.result;
+    const zone = document.getElementById('uploadZone');
+    // Remove old image if exists
+    const old = zone.querySelector('img');
+    if (old) old.remove();
+    const img = document.createElement('img');
+    img.src = uploadedDataURL;
+    zone.prepend(img);
+    zone.classList.add('has-image');
+    document.getElementById('analyzeBtn').classList.add('ready');
+  };
+  reader.readAsDataURL(file);
+}
+
+function analyzePhoto() {
+  if (!uploadedDataURL) return;
+  const img = new Image();
+  img.onload = function() {
+    const canvas = document.getElementById('analyzeCanvas');
+    const ctx = canvas.getContext('2d');
+    const size = 100; // sample size
+    canvas.width = size; canvas.height = size;
+    ctx.drawImage(img, 0, 0, size, size);
+    const data = ctx.getImageData(0, 0, size, size).data;
+
+    // ── Skin tone detection ──
+    // Check both full image and center region (face is usually center)
+    let skinAll = 0, totalAll = 0;
+    let skinCenter = 0, totalCenter = 0;
+    const cxMin = Math.floor(size*0.2), cxMax = Math.floor(size*0.8);
+    const cyMin = Math.floor(size*0.05), cyMax = Math.floor(size*0.65);
+
+    for (let y=0; y<size; y++) {
+      for (let x=0; x<size; x++) {
+        const i = (y*size+x)*4;
+        const r=data[i], g=data[i+1], b=data[i+2];
+        const isCenter = (x>=cxMin && x<=cxMax && y>=cyMin && y<=cyMax);
+
+        totalAll++;
+        if (isCenter) totalCenter++;
+
+        const isSkin = (
+          // Light/pale skin (common in studio photos, Asian skin)
+          (r>160 && g>120 && b>90 && r>b && (r-b)>10 && Math.abs(r-g)<80 && g>b) ||
+          // Medium skin
+          (r>95 && g>40 && b>20 && r>g && r>b && (r-g)>8 && (r-b)>15) ||
+          // Warm medium skin
+          (r>80 && g>50 && b>30 && r>g && (r-b)>12 && g>b) ||
+          // Darker skin
+          (r>60 && g>35 && b>20 && r>g && r>b && (r-g)>5 && (r-b)>15) ||
+          // Very light / East Asian skin (R,G,B all high but R still dominant)
+          (r>180 && g>150 && b>130 && r>=g && r>b && (r-b)>8)
+        );
+        if (isSkin) {
+          skinAll++;
+          if (isCenter) skinCenter++;
+        }
+      }
+    }
+    const skinRatioAll = skinAll / totalAll;
+    const skinRatioCenter = totalCenter > 0 ? skinCenter / totalCenter : 0;
+    // Pass if either full image has 3%+ skin, or center region has 5%+ skin
+    const skinRatio = Math.max(skinRatioAll, skinRatioCenter);
+
+    // If very low skin pixels → likely not a person photo
+    if (skinRatioAll < 0.02 && skinRatioCenter < 0.04) {
+      showSkinWarning();
+      return;
+    }
+
+    // ══════════════════════════════════════
+    //  ADVANCED MULTI-FEATURE ANALYSIS
+    // ══════════════════════════════════════
+
+    const w = size, h = size;
+    const px = (x,y) => {
+      const i = (y*w+x)*4;
+      return {r:data[i], g:data[i+1], b:data[i+2]};
+    };
+    const lum = (r,g,b) => (r*0.299+g*0.587+b*0.114)/255;
+
+    // ── 1. Global stats ──
+    let rSum=0,gSum=0,bSum=0,brightSum=0,count=0;
+    for (let i=0;i<data.length;i+=4) {
+      rSum+=data[i]; gSum+=data[i+1]; bSum+=data[i+2];
+      brightSum+=lum(data[i],data[i+1],data[i+2]);
+      count++;
+    }
+    const avgR=rSum/count, avgG=gSum/count, avgB=bSum/count;
+    const brightness = brightSum/count;
+
+    let varSum=0;
+    for (let i=0;i<data.length;i+=4) {
+      const b=lum(data[i],data[i+1],data[i+2]);
+      varSum+=(b-brightness)*(b-brightness);
+    }
+    const contrast = Math.sqrt(varSum/count);
+    const warmth = (avgR-avgB)/255;
+
+    let satSum=0;
+    for (let i=0;i<data.length;i+=4) {
+      const r2=data[i]/255,g2=data[i+1]/255,b2=data[i+2]/255;
+      const mx=Math.max(r2,g2,b2),mn=Math.min(r2,g2,b2);
+      satSum+=(mx===0?0:(mx-mn)/mx);
+    }
+    const saturation = satSum/count;
+
+    // ── 2. Zone analysis (3x3 grid) ──
+    const zones = Array.from({length:9}, ()=>({bright:0,warm:0,skin:0,count:0}));
+    for (let y=0;y<h;y++) for (let x=0;x<w;x++) {
+      const zx=Math.min(Math.floor(x/(w/3)),2);
+      const zy=Math.min(Math.floor(y/(h/3)),2);
+      const zi=zy*3+zx;
+      const {r,g,b:b3}=px(x,y);
+      zones[zi].bright+=lum(r,g,b3);
+      zones[zi].warm+=(r-b3)/255;
+      const isSkin=(r>80&&g>40&&b3>20&&r>g&&(r-b3)>10);
+      if(isSkin) zones[zi].skin++;
+      zones[zi].count++;
+    }
+    zones.forEach(z=>{z.bright/=z.count;z.warm/=z.count;z.skin/=z.count;});
+
+    // Face is typically in center-top zone (index 1) and center (4)
+    const faceZone = zones[4]; // center
+    const topCenter = zones[1]; // top-center
+    const bottomCenter = zones[7]; // bottom-center
+
+    // Face brightness relative to edges
+    const edgeBright = (zones[0].bright+zones[2].bright+zones[6].bright+zones[8].bright)/4;
+    const faceFocus = faceZone.bright - edgeBright; // positive = face is brighter (good lighting)
+
+    // ── 3. Smile heuristic ──
+    // If bottom-center of face area is brighter → possible smile (teeth/open mouth)
+    const smileHint = bottomCenter.bright - topCenter.bright;
+    // Warm center = positive expression
+    const expressionWarmth = faceZone.warm;
+
+    // ── 4. Symmetry analysis ──
+    let symDiff = 0, symCount = 0;
+    for (let y=0;y<h;y++) {
+      for (let x=0;x<Math.floor(w/2);x++) {
+        const left=px(x,y), right=px(w-1-x,y);
+        symDiff+=Math.abs(lum(left.r,left.g,left.b)-lum(right.r,right.g,right.b));
+        symCount++;
+      }
+    }
+    const symmetry = 1 - (symDiff/symCount); // 0~1, higher = more symmetric
+
+    // ── 5. Edge density (expression lines) ──
+    let edgeSum=0, edgeCount=0;
+    for (let y=1;y<h-1;y++) for (let x=1;x<w-1;x++) {
+      const c=lum(px(x,y).r,px(x,y).g,px(x,y).b);
+      const l=lum(px(x-1,y).r,px(x-1,y).g,px(x-1,y).b);
+      const r=lum(px(x+1,y).r,px(x+1,y).g,px(x+1,y).b);
+      const t=lum(px(x,y-1).r,px(x,y-1).g,px(x,y-1).b);
+      const b=lum(px(x,y+1).r,px(x,y+1).g,px(x,y+1).b);
+      edgeSum+=Math.abs(r-l)+Math.abs(b-t);
+      edgeCount++;
+    }
+    const edgeDensity = edgeSum/edgeCount; // higher = more detail/expression
+
+    // Center-region edge density (face area) vs overall
+    let cEdgeSum=0,cEdgeCount=0;
+    const cx1=Math.floor(w*0.25),cx2=Math.floor(w*0.75);
+    const cy1=Math.floor(h*0.15),cy2=Math.floor(h*0.75);
+    for (let y=cy1+1;y<cy2-1;y++) for (let x=cx1+1;x<cx2-1;x++) {
+      const c=lum(px(x,y).r,px(x,y).g,px(x,y).b);
+      const l=lum(px(x-1,y).r,px(x-1,y).g,px(x-1,y).b);
+      const r=lum(px(x+1,y).r,px(x+1,y).g,px(x+1,y).b);
+      const t=lum(px(x,y-1).r,px(x,y-1).g,px(x,y-1).b);
+      const b=lum(px(x,y+1).r,px(x,y+1).g,px(x,y+1).b);
+      cEdgeSum+=Math.abs(r-l)+Math.abs(b-t);
+      cEdgeCount++;
+    }
+    const faceEdgeDensity = cEdgeCount>0 ? cEdgeSum/cEdgeCount : edgeDensity;
+    const expressiveness = faceEdgeDensity / Math.max(edgeDensity, 0.001); // >1 = expressive face
+
+    // ── 6. Color diversity (background complexity) ──
+    let colorVar = 0;
+    for (let i=0;i<data.length;i+=4) {
+      colorVar += Math.abs(data[i]-avgR) + Math.abs(data[i+1]-avgG) + Math.abs(data[i+2]-avgB);
+    }
+    colorVar = colorVar / (count*3*255); // 0~1 normalized
+
+    // ── 7. Skin concentration score ──
+    // More skin in center = closer face = more approachable
+    const skinCenterZone = (zones[1].skin + zones[3].skin + zones[4].skin + zones[5].skin + zones[7].skin) / 5;
+    const skinEdge = (zones[0].skin + zones[2].skin + zones[6].skin + zones[8].skin) / 4;
+    const faceProximity = skinCenterZone - skinEdge; // positive = face is close
+
+    // ══════════════════════════════════════
+    //  SCORING with all features
+    // ══════════════════════════════════════
+    const rand = () => Math.random()*8 - 4;
+
+    // 호감도: brightness, warmth, smile hint, face proximity, expressiveness
+    let likeable = clamp(
+      42
+      + brightness * 20
+      + warmth * 12
+      + smileHint * 40        // smile adds a lot
+      + expressionWarmth * 15
+      + faceProximity * 20    // closer face = more approachable
+      + (expressiveness > 1.1 ? 8 : 0) // expressive face
+      + faceFocus * 15        // well-lit face
+      + rand()
+    );
+
+    // 신뢰감: symmetry, contrast, stability, face focus
+    let trust = clamp(
+      40
+      + symmetry * 25         // symmetric = trustworthy
+      + contrast * 20
+      + faceFocus * 15        // clear face
+      + (faceProximity > 0.1 ? 8 : 0) // visible face
+      - colorVar * 15         // too chaotic = less trust
+      - Math.abs(smileHint) * 5 // extreme expression = less stable
+      + brightness * 10
+      + rand()
+    );
+
+    // 힙함: saturation, color diversity, edge density, asymmetry
+    let hip = clamp(
+      38
+      + saturation * 25
+      + colorVar * 20         // color richness
+      + edgeDensity * 30      // visual complexity
+      + (1-symmetry) * 15     // slight asymmetry = artistic
+      + contrast * 15
+      + warmth * 8
+      - (brightness > 0.8 ? 10 : 0) // overexposed = not hip
+      + rand()
+    );
+
+    // 거리감: low smile, low warmth, high symmetry, low proximity
+    let distance = clamp(
+      45
+      - smileHint * 35        // smile reduces distance
+      - warmth * 15
+      - expressionWarmth * 12
+      - faceProximity * 20    // close face = less distance
+      + symmetry * 10         // too perfect = aloof
+      + (1-brightness) * 15   // dark = distant
+      - (expressiveness > 1.1 ? 10 : 0)
+      + rand()
+    );
+
+    // Skew towards 40~85 range
+    likeable = skew(likeable);
+    trust = skew(trust);
+    hip = skew(hip);
+    distance = skew(distance);
+
+    // Store analysis details for result insights
+    window._analysisFeatures = {
+      brightness, contrast, warmth, saturation,
+      symmetry, smileHint, expressiveness,
+      faceFocus, faceProximity, edgeDensity, colorVar,
+      skinRatio, expressionWarmth
+    };
+
+    // Save photo scores, then go to selection questions for combined analysis
+    photoScores = {likeable, trust, hip, distance};
+    currentQ = 0;
+    selectAnswers = {};
+    showScreen('selectScreen');
+    renderQuestion();
+  };
+  img.src = uploadedDataURL;
+}
+
+function showSkinWarning() {
+  const zone = document.getElementById('uploadZone');
+  // Show warning modal overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'skinWarningOverlay';
+  overlay.style.cssText = `
+    position:fixed; inset:0; z-index:999;
+    background:rgba(0,0,0,0.7); backdrop-filter:blur(8px);
+    display:flex; align-items:center; justify-content:center;
+    padding:20px; animation:fadeUp 0.3s ease;
+  `;
+  overlay.innerHTML = `
+    <div style="
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); padding:32px 28px;
+      max-width:380px; width:100%; text-align:center;
+    ">
+      <div style="font-size:48px; margin-bottom:16px;">🤔</div>
+      <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:10px; color:var(--text);">
+        프로필 사진이 맞나요?
+      </h3>
+      <p style="font-size:0.85rem; color:var(--dim); line-height:1.6; margin-bottom:24px;">
+        사람이 포함된 사진이 아닌 것 같아요.<br>
+        정확한 분석을 위해 얼굴이 나온<br>프로필 사진을 올려주세요!
+      </p>
+      <button onclick="closeWarningAndRetry()" style="
+        width:100%; padding:14px; border:none;
+        border-radius:12px; background:linear-gradient(135deg,var(--accent),var(--accent3));
+        color:#fff; font-size:0.92rem; font-weight:700;
+        cursor:pointer; font-family:inherit; margin-bottom:10px;
+      ">다른 사진으로 다시 하기</button>
+      <button onclick="closeWarningAndSelect()" style="
+        width:100%; padding:14px; border:1px solid var(--border);
+        border-radius:12px; background:var(--card);
+        color:var(--dim); font-size:0.85rem;
+        cursor:pointer; font-family:inherit;
+      ">사진 없이 선택형으로 하기</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function closeWarningAndRetry() {
+  const overlay = document.getElementById('skinWarningOverlay');
+  if (overlay) overlay.remove();
+  // Reset file input
+  document.getElementById('fileInput').value = '';
+  document.getElementById('fileInput').click();
+}
+
+function closeWarningAndSelect() {
+  const overlay = document.getElementById('skinWarningOverlay');
+  if (overlay) overlay.remove();
+  startSelect();
+}
+
+function clamp(v) { return Math.max(0, Math.min(100, Math.round(v))); }
+function skew(v) {
+  const base = 40 + (v / 100) * 48 + Math.random()*6;
+  if (Math.random() < 0.35) return clamp(base + 12); // 35% 확률로 상향 → 자랑 유도
+  return clamp(base);
+}
+
+// ══════════════════════════════
+//  SELECT MODE
+// ══════════════════════════════
+const questions = [
+  {
+    title: '프사 유형이 뭐예요?',
+    sub: '지금 쓰고 있는 프로필 사진에 가장 가까운 걸 골라주세요',
+    key: 'type',
+    options: [
+      {icon:'🤳', text:'셀카', val:'selfie'},
+      {icon:'🪞', text:'거울샷', val:'mirror'},
+      {icon:'✈️', text:'여행사진', val:'travel'},
+      {icon:'👥', text:'단체사진', val:'group'},
+      {icon:'🎨', text:'애니/캐릭터', val:'character'},
+      {icon:'🌅', text:'풍경/사물', val:'landscape'},
+    ]
+  },
+  {
+    title: '표정은 어때요?',
+    sub: '사진 속 표정에 가장 가까운 걸 골라주세요',
+    key: 'expression',
+    options: [
+      {icon:'😐', text:'무표정', val:'neutral'},
+      {icon:'🙂', text:'살짝 미소', val:'smile'},
+      {icon:'😄', text:'활짝 웃음', val:'laugh'},
+      {icon:'🧐', text:'진지함', val:'serious'},
+    ]
+  },
+  {
+    title: '배경 느낌은?',
+    sub: '사진의 전체적인 분위기를 골라주세요',
+    key: 'bg',
+    options: [
+      {icon:'✨', text:'깔끔/심플', val:'clean'},
+      {icon:'🌸', text:'감성 필터', val:'filter'},
+      {icon:'🌙', text:'어두운 톤', val:'dark'},
+      {icon:'☀️', text:'밝은 톤', val:'bright'},
+    ]
+  },
+  {
+    title: '나 실제로는…',
+    sub: '프사와 상관없이, 진짜 내 성격에 가장 가까운 걸 골라주세요',
+    key: 'realme',
+    options: [
+      {icon:'🔥', text:'활발/외향적', val:'extrovert'},
+      {icon:'🏠', text:'조용/내향적', val:'introvert'},
+      {icon:'🎭', text:'겉과 속이 다름', val:'dualmask'},
+      {icon:'🌊', text:'상황에 따라 다름', val:'adaptive'},
+    ]
+  }
+];
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  // Progress
+  let progHTML = '';
+  for (let i=0; i<questions.length; i++) {
+    const cls = i<currentQ?'done': i===currentQ?'current':'';
+    progHTML += `<div class="q-dot ${cls}"></div>`;
+  }
+  document.getElementById('qProgress').innerHTML = progHTML;
+
+  // Photo context banner (upload mode only, first question)
+  let photoCtx = '';
+  if (mode === 'upload' && uploadedDataURL && currentQ === 0) {
+    photoCtx = `<div style="
+      display:flex; align-items:center; gap:12px;
+      background:var(--card); border:1px solid var(--border);
+      border-radius:12px; padding:14px 16px; margin-bottom:20px;
+    ">
+      <img src="${uploadedDataURL}" style="width:44px;height:44px;border-radius:10px;object-fit:cover;border:2px solid var(--accent);">
+      <div>
+        <div style="font-size:0.82rem;font-weight:600;color:var(--accent);">✅ 사진 분석 완료</div>
+        <div style="font-size:0.75rem;color:var(--dim);">추가 질문으로 정밀도를 높여볼게요</div>
+      </div>
+    </div>`;
+  }
+
+  let html = photoCtx;
+  html += `<h2 class="q-title">${q.title}</h2><p class="q-sub">${q.sub}</p>`;
+  html += `<div class="options-grid">`;
+  q.options.forEach(o => {
+    html += `<button class="opt-btn" onclick="selectOption('${q.key}','${o.val}')">
+      <div class="opt-icon">${o.icon}</div>
+      <div>${o.text}</div>
+    </button>`;
+  });
+  html += `</div>`;
+  document.getElementById('questionArea').innerHTML = html;
+}
+
+function selectOption(key, val) {
+  selectAnswers[key] = val;
+  currentQ++;
+  if (currentQ < questions.length) {
+    renderQuestion();
+  } else {
+    calculateSelectScores();
+  }
+}
+
+function calculateSelectScores() {
+  // Base scores for selection
+  let selL=50, selT=50, selH=50, selD=50;
+
+  // Type scores
+  const typeScores = {
+    selfie:   {l:12,t:-5,h:5,d:-8},
+    mirror:   {l:5,t:-3,h:12,d:-2},
+    travel:   {l:15,t:5,h:10,d:-12},
+    group:    {l:10,t:10,h:-2,d:-10},
+    character:{l:-5,t:-8,h:18,d:10},
+    landscape:{l:3,t:8,h:8,d:15},
+  };
+  const ts = typeScores[selectAnswers.type] || {};
+  selL += ts.l||0; selT += ts.t||0; selH += ts.h||0; selD += ts.d||0;
+
+  // Expression scores
+  const exprScores = {
+    neutral: {l:-5,t:10,h:5,d:12},
+    smile:   {l:12,t:8,h:0,d:-10},
+    laugh:   {l:18,t:3,h:-3,d:-15},
+    serious: {l:-3,t:15,h:8,d:8},
+  };
+  const es = exprScores[selectAnswers.expression] || {};
+  selL += es.l||0; selT += es.t||0; selH += es.h||0; selD += es.d||0;
+
+  // BG scores
+  const bgScores = {
+    clean:  {l:8,t:12,h:3,d:-5},
+    filter: {l:-3,t:-5,h:15,d:5},
+    dark:   {l:-8,t:5,h:12,d:12},
+    bright: {l:12,t:5,h:-3,d:-10},
+  };
+  const bs = bgScores[selectAnswers.bg] || {};
+  selL += bs.l||0; selT += bs.t||0; selH += bs.h||0; selD += bs.d||0;
+
+  // "Real me" scores — slightly adjusts final result
+  const realmeScores = {
+    extrovert: {l:6,t:0,h:2,d:-8},
+    introvert: {l:-3,t:5,h:3,d:6},
+    dualmask:  {l:2,t:-3,h:8,d:3},
+    adaptive:  {l:4,t:3,h:4,d:-2},
+  };
+  const rm = realmeScores[selectAnswers.realme] || {};
+  selL += rm.l||0; selT += rm.t||0; selH += rm.h||0; selD += rm.d||0;
+
+  const r = () => Math.random()*8 - 4;
+  let likeable, trust, hip, distance;
+
+  if (mode === 'upload' && photoScores) {
+    // ── COMBINED MODE: 60% photo + 40% selection ──
+    likeable = clamp(photoScores.likeable * 0.6 + selL * 0.4 + r());
+    trust    = clamp(photoScores.trust * 0.6 + selT * 0.4 + r());
+    hip      = clamp(photoScores.hip * 0.6 + selH * 0.4 + r());
+    distance = clamp(photoScores.distance * 0.6 + selD * 0.4 + r());
+  } else {
+    // ── SELECT ONLY MODE ──
+    likeable = selL; trust = selT; hip = selH; distance = selD;
+    likeable = skew(clamp(likeable + r()));
+    trust = skew(clamp(trust + r()));
+    hip = skew(clamp(hip + r()));
+    distance = skew(clamp(distance + r()));
+  }
+
+  // 🔥 최소 1개 점수 80+ 보장 (공유 욕구 자극)
+  const vals = [likeable, trust, hip, distance];
+  if (Math.max(...vals) < 78) {
+    const boost = Math.floor(Math.random() * 3); // 0~2 (거리감 제외)
+    if (boost === 0) likeable = clamp(likeable + 15 + Math.random()*8);
+    else if (boost === 1) trust = clamp(trust + 15 + Math.random()*8);
+    else hip = clamp(hip + 15 + Math.random()*8);
+  }
+
+  showLoading({likeable, trust, hip, distance});
+}
+
+// ═══ 🔥 논란 유도 문장 (결과 상단 노출) ═══
+const hotLines = [
+  "이 유형은 DM 먼저 오는 확률 높음 📩",
+  "이 프사는 소개팅에서 유리한 편",
+  "이 유형은 첫인상에서 손해 볼 수도 있음",
+  "이 프사 쓰는 사람들 의외로 인기 많음",
+  "상대방이 프사 보고 호감을 느꼈을 확률 높음",
+  "이 유형은 카톡 프사로 오해 많이 받는 편",
+  "이 프사는 인스타 팔로우 잘 받는 스타일",
+  "이 유형은 첫만남에서 분위기 메이커 됨",
+  "이 프사 때문에 연락 먼저 못 하는 사람 있음",
+  "이 유형은 프사만 보고 관심 가지는 사람 꽤 있음",
+];
+
+// ═══ 🔥 태그 유도 문구 ═══
+const tagLines = [
+  "이 유형인 친구 태그해봐 😂",
+  "너 주변에 이런 사람 있음? 🤔",
+  "이 프사 쓰는 애 한 명은 있음 ㅋㅋ",
+  "이거 보고 떠오른 사람한테 보내봐 👀",
+  "친구들한테 시켜보고 비교해봐 🔥",
+];
+
+// ══════════════════════════════
+//  LOADING
+// ══════════════════════════════
+function showLoading(scores) {
+  showScreen('loadingScreen');
+
+  const loadingSteps = mode === 'upload' ? [
+    '사진 데이터 통합 중…',
+    '선택 응답 반영 중…',
+    '얼굴 영역 재분석 중…',
+    '표정 · 색온도 교차 검증 중…',
+    '인상 매칭 알고리즘 적용 중…',
+    '사회적 반응 예측 중…',
+    '맞춤형 리포트 생성 중…',
+  ] : [
+    '선택 데이터 수집 중…',
+    '인상 패턴 매칭 중…',
+    '사회적 반응 예측 중…',
+    '인상 매칭 알고리즘 적용 중…',
+    '리포트 생성 중…',
+  ];
+
+  // Thumbnail
+  const wrap = document.getElementById('loadingThumbWrap');
+  if (mode === 'upload' && uploadedDataURL) {
+    wrap.innerHTML = `<img class="loading-thumb" src="${uploadedDataURL}" alt="">`;
+  } else {
+    wrap.innerHTML = `<div class="loading-icon-placeholder">🧠</div>`;
+  }
+
+  let progress = 0;
+  const stepDuration = 500;
+  const totalDuration = loadingSteps.length * stepDuration;
+  let stepIndex = 0;
+
+  const stepEl = document.getElementById('loadingStep');
+  const fillEl = document.getElementById('progressFill');
+  const pctEl  = document.getElementById('progressPct');
+
+  stepEl.textContent = loadingSteps[0];
+
+  const stepInterval = setInterval(() => {
+    stepIndex++;
+    if (stepIndex < loadingSteps.length) {
+      stepEl.style.opacity = 0;
+      setTimeout(() => {
+        stepEl.textContent = loadingSteps[stepIndex];
+        stepEl.style.opacity = 1;
+      }, 150);
+    }
+  }, stepDuration);
+
+  const startTime = Date.now();
+  const progressInterval = setInterval(() => {
+    const elapsed = Date.now() - startTime;
+    progress = Math.min(100, (elapsed / totalDuration) * 100);
+    fillEl.style.width = progress + '%';
+    pctEl.textContent = Math.round(progress) + '%';
+
+    if (progress >= 100) {
+      clearInterval(progressInterval);
+      clearInterval(stepInterval);
+      setTimeout(() => showResult(scores), 400);
+    }
+  }, 30);
+}
+
+// ══════════════════════════════
+//  RESULT TYPES (24 types)
+// ══════════════════════════════
+const types = {
+  // A-grade (high likeable + something)
+  A1: { name:'인간 햇살형', grade:'A', emoji:'☀️',
+    desc:'보기만 해도 기분 좋아지는 프사',
+    insight1:'첫인상 한 줄: 이 사람은 절대 나쁜 사람 아닐 거야',
+    insight2:'혹시 처음 만난 사람에게 "어디서 봤나?" 소리 자주 듣지 않나요? 당신의 프사는 사람들의 방어벽을 무너뜨리는 힘이 있어요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 사실 혼자 있을 때가 제일 편하고, 에너지 충전은 방에서 누워서 하는 타입. 밖에서 보이는 것만큼 늘 밝지는 않아요.',
+    tip:'지금 프사 유지하세요. 다만 너무 밝기만 하면 가벼워 보일 수 있으니 가끔 진지한 사진도 좋아요.' },
+  A2: { name:'신뢰 폭격기', grade:'A', emoji:'🛡️',
+    desc:'이 사람한테는 비밀 말해도 될 것 같아',
+    insight1:'첫인상 한 줄: 믿을 수 있는 사람이라는 걸 프사가 증명한다',
+    insight2:'혹시 친구들이 고민 상담을 당신한테만 하진 않나요? 프사에서 이미 "이 사람은 진지하게 들어줄 거야"라는 시그널이 나와요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 의외로 유머 감각이 뛰어나고, 친해지면 텐션 높은 사람. 다만 처음엔 그걸 잘 안 보여줘서 아쉬운 타입.',
+    tip:'신뢰감은 최상급이에요. 여기에 살짝 웃는 사진이면 호감도까지 폭발합니다.' },
+  A3: { name:'조용한 카리스마', grade:'A', emoji:'🌑',
+    desc:'말 안 해도 존재감이 느껴지는 프사',
+    insight1:'첫인상 한 줄: 뭔가 있어 보이는데 정체를 모르겠다',
+    insight2:'혹시 "되게 차가워 보였는데 알고 보니 따뜻하다"는 말을 들은 적 있나요? 당신의 프사는 미스터리한 매력을 만들어요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 생각보다 감정이 풍부하고, 좋아하는 것에 대한 열정이 대단한 사람. 다만 그걸 표현하는 게 서툴러요.',
+    tip:'지금 분위기 매우 좋습니다. 가끔 일상 사진을 올리면 "반전 매력" 효과를 극대화할 수 있어요.' },
+  A4: { name:'분위기 장인', grade:'A', emoji:'🎨',
+    desc:'감각이 남다른 프사',
+    insight1:'첫인상 한 줄: 이 사람 취향 믿을 수 있다',
+    insight2:'혹시 친구들이 당신한테 맛집이나 카페 추천을 자주 물어보지 않나요? 프사만 봐도 감각적인 사람이라는 게 느껴져요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 완벽주의 성향이 있어서 프사 하나 고르는 데도 30분은 고민하는 타입. 남들은 모르는 당신만의 기준이 확실해요.',
+    tip:'감각은 이미 충분해요. 자연스러운 순간을 담은 사진이면 인위적이라는 오해도 사라집니다.' },
+  A5: { name:'감성 힙스터', grade:'A', emoji:'🌿',
+    desc:'트렌디하면서 감성적인 프사',
+    insight1:'첫인상 한 줄: 이 사람 인스타 피드 예쁠 듯',
+    insight2:'혹시 사진 찍을 때 각도나 빛을 은근히 신경 쓰는 편 아닌가요? 그 섬세함이 프사에 고스란히 묻어나와요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 겉보기와 달리 의외로 허당 기질이 있고, 감정에 솔직한 편. 힙한 겉모습 뒤에 따뜻한 마음이 숨어 있어요.',
+    tip:'힙함과 호감이 모두 높은 이상적인 조합이에요. 가끔 일상적인 순간을 공유하면 더 친근해 보여요.' },
+  A6: { name:'소개팅 프리패스형', grade:'A', emoji:'💫',
+    desc:'프사만으로 만나보고 싶게 만드는 매력',
+    insight1:'첫인상 한 줄: 프사 보자마자 "이 사람이야" 하는 타입',
+    insight2:'혹시 소개팅에서 상대방이 "사진보다 실물이 나은데요"보다 "사진대로네요!" 쪽을 더 많이 듣나요? 프사의 매력이 그대로 전달되고 있어요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 실은 만나기 전에 긴장을 꽤 많이 하는 타입. 프사는 자신감 있어 보이지만 속으로는 "어떻게 보일까" 고민이 많아요.',
+    tip:'호감도 최상위입니다. 이 프사 바꾸지 마세요. 진지하게.' },
+
+  // B-grade
+  B1: { name:'은근 호감형', grade:'B', emoji:'🌤️',
+    desc:'볼수록 괜찮아 보이는 스타일',
+    insight1:'첫인상 한 줄: 처음엔 몰랐는데 자꾸 눈이 가는 프사',
+    insight2:'혹시 "처음에는 관심 없었는데 알고 보니 괜찮더라"는 말을 들은 적 있나요? 당신의 프사는 서서히 스며드는 매력이 있어요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 사실 첫인상보다 실물이 더 좋은 타입. 프사가 당신의 매력을 100% 담지 못하고 있을 수 있어요.',
+    tip:'자연광에서 찍은 자연스러운 미소 사진으로 바꾸면 호감도 +12 예상됩니다.' },
+  B2: { name:'차분한 전략가', grade:'B', emoji:'♟️',
+    desc:'생각이 깊어 보이는 프사',
+    insight1:'첫인상 한 줄: 이 사람은 쉽게 읽히지 않는다',
+    insight2:'혹시 "포커페이스"라는 말을 들어본 적 있나요? 프사에서 감정보다 지성이 먼저 느껴져요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 겉보기와 달리 감성적인 면이 있고, 좋아하는 사람 앞에서는 말이 많아지는 타입.',
+    tip:'현재 프사는 전문성이 느껴지지만 약간 차가울 수 있어요. 밝은 배경이나 따뜻한 톤 추가를 추천합니다.' },
+  B3: { name:'현실 친구상', grade:'B', emoji:'🤝',
+    desc:'편안하고 같이 있고 싶은 프사',
+    insight1:'첫인상 한 줄: 이 사람이랑은 밥 같이 먹어도 어색하지 않겠다',
+    insight2:'혹시 새로 만난 사람이 금방 편하게 말을 놓거나 반말을 하지 않나요? 당신의 프사는 벽 없는 편안함을 줘요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 사실 내면에 은근한 승부욕이 있고, 자기만의 세계가 확고한 사람. 편해 보이지만 아무에게나 깊은 이야기를 하진 않아요.',
+    tip:'친근함은 큰 장점이에요. 여기에 감각적인 배경이나 구도를 더하면 "편안하면서 세련된" 인상으로 업그레이드됩니다.' },
+  B4: { name:'말 걸기 애매형', grade:'B', emoji:'🤔',
+    desc:'괜찮아 보이는데 DM 보내기엔 망설여지는 프사',
+    insight1:'첫인상 한 줄: 좋아 보이긴 한데… 먼저 다가가도 될까?',
+    insight2:'혹시 "너 되게 무서워 보였어"라는 말을 친해진 뒤에 들은 적 있나요? 프사가 당신을 실제보다 약간 어렵게 보이게 만들고 있어요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 먼저 다가가는 게 서투를 뿐이지, 누군가 다가오면 기꺼이 환영하는 사람. 차가운 척하는 따뜻한 사람.',
+    tip:'살짝 미소만 추가해도 "말 걸어도 될 것 같은" 인상으로 바뀝니다. 호감도 +10 예상.' },
+  B5: { name:'훈훈한 선배상', grade:'B', emoji:'📚',
+    desc:'뭔가 배울 게 있어 보이는 프사',
+    insight1:'첫인상 한 줄: 이 사람한테 조언 구하면 진짜 도움될 듯',
+    insight2:'혹시 후배나 동생 같은 사람들이 유독 잘 따르지 않나요? 프사에서 듬직함과 신뢰가 느껴져요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 실은 본인도 누군가에게 기대고 싶을 때가 있지만, 쉽게 표현하지 못하는 타입.',
+    tip:'신뢰감이 높아 직업적 프사로도 좋아요. 가끔 유머러스한 면을 보여주면 매력이 배가됩니다.' },
+  B6: { name:'무난 안정형', grade:'B', emoji:'🏠',
+    desc:'거부감 없이 편안한 프사',
+    insight1:'첫인상 한 줄: 부담 없고 나쁘지 않은 느낌',
+    insight2:'혹시 "너 프사 언제 바꿨어?" 하고 물어보는 사람이 별로 없지 않나요? 무난한 건 좋지만, 기억에 남기엔 임팩트가 조금 부족해요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 은근 개성 강한데, 프사에 그걸 담지 못하고 있을 뿐. 안전한 선택을 하려는 성향이 프사에도 드러나요.',
+    tip:'나쁘지 않지만 아쉬워요. 조금만 더 개성을 보여주면 "무난"에서 "매력적"으로 올라갈 수 있어요.' },
+
+  // C-grade
+  C1: { name:'낯가림 유발형', grade:'C', emoji:'🧊',
+    desc:'다가가기 살짝 어려운 프사',
+    insight1:'첫인상 한 줄: 먼저 말 걸면 무시당할 것 같아',
+    insight2:'혹시 "나한테 관심 없는 줄 알았어"라는 말을 많이 듣나요? 프사가 의도치 않게 벽을 만들고 있어요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 사실 누군가 먼저 다가와주면 정말 좋아하는 타입. 높아 보이는 벽은 그냥 낯가림일 뿐이에요.',
+    tip:'정면 사진 + 자연스러운 미소로 바꾸면 거리감이 크게 줄어들어요. 밝은 배경도 추천.' },
+  C2: { name:'오해받기 쉬움', grade:'C', emoji:'🎭',
+    desc:'실제와 프사 인상이 다를 확률 높음',
+    insight1:'첫인상 한 줄: 프사 느낌이랑 실제가 다를 것 같다',
+    insight2:'혹시 "만나보니까 완전 다르네"라는 말을 자주 듣나요? 프사가 당신의 진짜 매력을 전달하지 못하고 있을 수 있어요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 실제로는 프사보다 훨씬 매력적일 가능성이 높아요. 사진이 당신의 에너지를 못 담고 있는 거예요.',
+    tip:'자연스러운 순간을 담은 사진으로 바꿔보세요. "연출된" 느낌을 줄이면 실물과의 괴리가 줄어들어요.' },
+  C3: { name:'거리감 생성기', grade:'C', emoji:'🚪',
+    desc:'프사만으로 심리적 거리가 느껴지는 타입',
+    insight1:'첫인상 한 줄: 이 사람은 자기만의 세계가 있을 듯',
+    insight2:'혹시 SNS에서 팔로우 요청을 잘 안 받는 편인가요? 프사가 "나는 쉽게 다가올 수 없다"는 메시지를 보내고 있어요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 신뢰할 수 있는 사람에겐 엄청 헌신적이고, 한번 친해지면 절대 먼저 떠나지 않는 타입.',
+    tip:'프사에서 얼굴이 보이지 않거나 너무 멀리 있으면 거리감이 커져요. 조금 더 가까이, 조금 더 밝게.' },
+  C4: { name:'감정 미스터리', grade:'C', emoji:'🔮',
+    desc:'표정에서 감정을 읽기 어려운 프사',
+    insight1:'첫인상 한 줄: 지금 기분이 좋은 건지 나쁜 건지 모르겠다',
+    insight2:'혹시 "뭐 생각해?" 라는 질문을 자주 받지 않나요? 프사에서도 감정이 잘 읽히지 않아서 사람들이 궁금해하면서도 다가가기 어려워해요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 감정을 표현하는 게 서투른 것뿐, 내면은 감정이 풍부하고 세심한 사람.',
+    tip:'미세한 미소만 추가해도 "미스터리"에서 "매력적인 미스터리"로 업그레이드돼요.' },
+  C5: { name:'프로 무표정러', grade:'C', emoji:'😶',
+    desc:'표정이 거의 없는 프사',
+    insight1:'첫인상 한 줄: 진지한 건지 귀찮은 건지 구분이 안 됨',
+    insight2:'혹시 사진 찍을 때 어떤 표정을 지어야 할지 모르겠는 편인가요? 그 고민이 프사에 그대로 드러나고 있어요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 실은 웃는 얼굴이 꽤 매력적인데, 카메라 앞에서만 굳어지는 타입. 솔직한 순간을 포착하면 매력이 폭발해요.',
+    tip:'누군가 찍어준 자연스러운 사진이 가장 좋아요. 셀카보다 타인 시점의 사진을 추천합니다.' },
+  C6: { name:'컨셉 과몰입형', grade:'C', emoji:'🎪',
+    desc:'컨셉이 너무 강해서 본인이 안 보이는 프사',
+    insight1:'첫인상 한 줄: 프사에서 "나"보다 "컨셉"이 먼저 보인다',
+    insight2:'혹시 프사 고를 때 "이렇게 보이고 싶다"는 생각을 많이 하는 편인가요? 그 의도가 너무 강하게 느껴지면 오히려 역효과가 날 수 있어요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 사실 자기표현 욕구가 강하고 센스 있는 사람. 다만 그걸 "자연스럽게" 보여주는 법을 찾으면 매력이 배가돼요.',
+    tip:'컨셉을 30% 줄이고 자연스러움을 70% 높여보세요. "힘 빼면 더 예뻐요."' },
+
+  // D-grade (improvement needed)
+  D1: { name:'필터 과다', grade:'D', emoji:'🌈',
+    desc:'필터가 본인보다 먼저 보이는 프사',
+    insight1:'첫인상 한 줄: 실물이 궁금한데 필터 때문에 알 수가 없다',
+    insight2:'혹시 보정 없이 사진 올리는 게 불안한 편인가요? 필터는 안전장치처럼 느껴지지만, 오히려 진짜 매력을 가리고 있을 수 있어요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 보정 없는 얼굴이 필터보다 매력적일 확률 높아요. 자신감만 조금 더 가지면 됩니다.',
+    tip:'필터를 빼고 자연광 사진으로 교체하는 것만으로도 호감도 +15, 신뢰감 +20 예상됩니다.' },
+  D2: { name:'배경 혼잡러', grade:'D', emoji:'🗑️',
+    desc:'배경에 시선이 분산되는 프사',
+    insight1:'첫인상 한 줄: 어디를 봐야 하는 건지 모르겠다',
+    insight2:'혹시 사진을 고를 때 배경보다 본인 표정에만 집중하는 편인가요? 사람들은 배경부터 봐요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 디테일보다 큰 그림을 보는 타입. 그래서 사진 속 작은 요소들을 놓치기 쉬워요.',
+    tip:'심플한 단색 배경이나 자연 배경에서 다시 찍어보세요. 주인공은 당신이어야 해요.' },
+  D3: { name:'조명 실종형', grade:'D', emoji:'🌑',
+    desc:'너무 어둡거나 역광인 프사',
+    insight1:'첫인상 한 줄: 사진이 어두워서 인상 파악 자체가 어렵다',
+    insight2:'혹시 밤에 찍은 사진이나 실내 어두운 곳에서 찍은 사진을 프사로 쓰고 있나요? 조명 하나로 인상이 완전히 바뀝니다.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 밝은 곳에서 보면 훨씬 좋은 인상인데, 사진이 그걸 못 보여주고 있어요.',
+    tip:'자연광(창가, 야외)에서 찍은 사진으로 교체하면 호감도가 확 올라갈 거예요.' },
+  D4: { name:'너무 멀리 있음', grade:'D', emoji:'🔭',
+    desc:'얼굴이 잘 안 보이는 프사',
+    insight1:'첫인상 한 줄: 이 사람 얼굴을 보려면 확대를 해야 한다',
+    insight2:'혹시 본인을 드러내는 게 불편해서 일부러 먼 곳에서 찍은 사진을 쓰고 있나요? 그 심리가 프사에 반영돼요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 겸손하고 자기 과시를 싫어하는 성향. 하지만 프사에서는 조금 더 자신을 보여줘도 괜찮아요.',
+    tip:'상반신이 잘 보이는 거리에서 다시 찍어보세요. 가까울수록 친밀감이 높아집니다.' },
+  D5: { name:'각도 미스', grade:'D', emoji:'📐',
+    desc:'각도가 아쉬운 프사',
+    insight1:'첫인상 한 줄: 약간만 각도가 달랐으면 좋았을 텐데',
+    insight2:'혹시 셀카를 아래에서 위로 찍거나, 극단적인 각도에서 찍은 건 아닌가요? 각도 하나로 인상이 완전히 달라져요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 본인이 예쁘게 나오는 각도를 아직 못 찾은 것뿐. 조금만 연구하면 호감도가 크게 올라가요.',
+    tip:'눈높이 또는 살짝 위에서 찍는 게 가장 자연스러워요. 45도 각도가 대부분의 사람에게 유리합니다.' },
+  D6: { name:'표정 봉인형', grade:'D', emoji:'🔒',
+    desc:'감정을 완전히 숨긴 프사',
+    insight1:'첫인상 한 줄: 이 사람은 프사로 소통하고 싶지 않은 것 같다',
+    insight2:'혹시 프사가 "남들이 보는 나"보다 "나만의 공간"이라고 생각하나요? 그 태도가 프사에 그대로 드러나서 사람들이 다가가기 어려워해요.',
+    insight3:'프사 뒤에 숨겨진 진짜 당신: 선택적으로 마음을 여는 사람. 아무에게나 자신을 보여주지 않는 건 나쁜 게 아니지만, 프사는 첫인상의 창구라는 걸 기억하세요.',
+    tip:'완전 무장 해제할 필요 없어요. 살짝 표정 하나, 살짝 밝기 하나만 바꿔도 인상이 훨씬 부드러워집니다.' },
+};
+
+// ══════════════════════════════
+//  PHOTO-SPECIFIC INSIGHTS
+// ══════════════════════════════
+function buildPhotoInsights(f) {
+  const items = [];
+
+  // Smile detection
+  if (f.smileHint > 0.03) items.push('📸 사진에서 <span class="highlight">미소가 감지</span>됐어요. 입꼬리가 올라간 느낌이 호감도를 높이고 있어요.');
+  else if (f.smileHint < -0.02) items.push('📸 살짝 <span class="highlight">입을 다물고 있는 표정</span>이에요. 진지한 인상을 줄 수 있지만 차가워 보일 수도 있어요.');
+  else items.push('📸 <span class="highlight">담담한 표정</span>이에요. 감정을 잘 드러내지 않는 느낌이 미스터리한 매력을 만들어요.');
+
+  // Face proximity
+  if (f.faceProximity > 0.15) items.push('📏 얼굴이 <span class="highlight">가까이</span> 찍혀서 친근하고 자신감 있는 인상을 줘요.');
+  else if (f.faceProximity < 0) items.push('📏 얼굴이 <span class="highlight">멀리</span> 찍혀 있어서 약간 거리감이 느껴져요. 조금만 가까이 찍으면 호감도가 올라가요.');
+
+  // Lighting
+  if (f.faceFocus > 0.08) items.push('💡 얼굴 쪽 <span class="highlight">조명이 잘 맞아</span>요. 자연광 느낌이 신뢰감을 높이고 있어요.');
+  else if (f.faceFocus < -0.03) items.push('💡 배경이 얼굴보다 밝아서 <span class="highlight">역광</span> 느낌이에요. 얼굴 쪽에 빛이 오면 인상이 확 달라져요.');
+
+  // Symmetry
+  if (f.symmetry > 0.88) items.push('⚖️ 좌우 <span class="highlight">대칭도가 높아</span>요. 안정감 있고 신뢰 가는 인상이에요.');
+  else if (f.symmetry < 0.75) items.push('⚖️ 약간 <span class="highlight">비대칭적인 구도</span>예요. 자연스럽고 예술적인 느낌이 힙함을 올려줘요.');
+
+  // Expression richness
+  if (f.expressiveness > 1.2) items.push('🎭 표정이 <span class="highlight">풍부</span>해요! 감정 전달력이 높아서 사람들이 편하게 느껴요.');
+  else if (f.expressiveness < 0.85) items.push('🎭 표정이 <span class="highlight">담백</span>해요. 감정을 많이 드러내지 않는 스타일이 느껴져요.');
+
+  // Warmth
+  if (f.warmth > 0.1) items.push('🌡️ 전체적으로 <span class="highlight">따뜻한 톤</span>이에요. 부드럽고 다가가기 쉬운 느낌을 줘요.');
+  else if (f.warmth < -0.05) items.push('🌡️ <span class="highlight">차가운 톤</span>이에요. 세련되고 도시적인 느낌이지만 약간 냉정해 보일 수 있어요.');
+
+  // Saturation
+  if (f.saturation > 0.4) items.push('🎨 색감이 <span class="highlight">선명</span>해요. 생동감 있고 에너지 넘치는 인상이에요.');
+
+  // Pick best 3~4 insights
+  const selected = items.slice(0, 4);
+  if (selected.length === 0) return '';
+
+  return `
+    <div class="insight-card anim-in" style="transition-delay:1.1s; border-color:rgba(34,211,238,0.15);">
+      <div class="insight-title" style="color:var(--cyan)">📊 사진 정밀 분석 결과</div>
+      ${selected.map(s => `<p style="margin-bottom:8px">${s}</p>`).join('')}
+    </div>
+  `;
+}
+
+// ══════════════════════════════
+//  GAP ANALYSIS (프사 vs 실제 나)
+// ══════════════════════════════
+function buildGapAnalysis(scores, typeData) {
+  const realme = selectAnswers.realme;
+  if (!realme) return '';
+
+  const {likeable:l, trust:t, hip:h, distance:d} = scores;
+  const isWarm = l > 65;       // 프사가 따뜻한 인상
+  const isCold = d > 60;       // 프사가 차가운 인상
+  const isTrusty = t > 65;     // 프사가 믿음직
+  const isHip = h > 65;        // 프사가 힙함
+
+  let gapTitle = '';
+  let gapDesc = '';
+  let gapDetail = '';
+
+  if (realme === 'extrovert') {
+    if (isCold) {
+      gapTitle = '🧊→🔥 츤데레 확정';
+      gapDesc = '프사는 차갑지만 실제론 완전 활발한 사람';
+      gapDetail = '처음 만난 사람들이 당신의 프사만 보고 "좀 무서울 것 같다"고 생각하지만, 실제로 만나면 <span class="highlight">"어? 완전 다른 사람이네?"</span> 반응이 나와요. 이 갭 자체가 당신의 최대 무기예요.';
+    } else if (isWarm) {
+      gapTitle = '☀️ 보이는 대로 따뜻한 사람';
+      gapDesc = '프사와 실제 성격이 일치하는 희귀한 케이스';
+      gapDetail = '프사에서 느껴지는 에너지가 실제 당신과 거의 일치해요. 사람들이 <span class="highlight">"사진 그대로네"</span>라고 느끼는 타입. 이건 큰 장점이에요 — 신뢰도가 높다는 뜻이거든요.';
+    } else {
+      gapTitle = '🔥 숨겨진 텐션 보유';
+      gapDesc = '프사보다 실제로 만나면 훨씬 재밌는 사람';
+      gapDetail = '프사만 봤을 땐 잔잔한 느낌이지만, 실제로는 에너지가 넘치는 사람이에요. <span class="highlight">만나면 반전인 스타일</span>이라 한번 친해지면 금방 핵인싸가 돼요.';
+    }
+  } else if (realme === 'introvert') {
+    if (isWarm) {
+      gapTitle = '😊→🏠 밖에선 밝고 안에선 조용';
+      gapDesc = '프사는 활발해 보이지만 충전은 혼자서';
+      gapDetail = '프사를 보면 사교적이고 밝은 사람 같지만, 실제로는 <span class="highlight">혼자만의 시간이 꼭 필요한 타입</span>이에요. 주변 사람들은 모를 수도 있어요 — 당신이 얼마나 에너지를 써가며 밝게 지내는지.';
+    } else if (isCold) {
+      gapTitle = '🌙 일관된 미스터리';
+      gapDesc = '프사도 조용하고, 실제로도 조용한 일관형';
+      gapDetail = '프사의 분위기와 실제 성격이 조용히 일치해요. <span class="highlight">가까운 사람에게만 보여주는 다정함</span>이 있는 타입. 쉽게 열리지 않지만, 한번 열리면 깊은 관계를 만들어요.';
+    } else {
+      gapTitle = '🏠 고요한 매력 보유';
+      gapDesc = '내향적인데 프사에선 그게 잘 안 드러남';
+      gapDetail = '프사만 보면 평범해 보이지만, 가까이서 보면 <span class="highlight">생각이 깊고 감성이 풍부한 사람</span>이에요. 프사가 당신의 내면적 깊이를 아직 다 보여주지 못하고 있어요.';
+    }
+  } else if (realme === 'dualmask') {
+    if (isWarm) {
+      gapTitle = '🎭 반전 매력의 정석';
+      gapDesc = '따뜻해 보이지만 속은 훨씬 복잡한 사람';
+      gapDetail = '프사에서 풍기는 온화한 이미지와 달리, 실제로는 <span class="highlight">여러 겹의 모습을 가진 다면체</span>예요. "알면 알수록 새로운 사람"이라는 말을 들을 타입. 그게 당신의 매력이에요.';
+    } else if (isCold) {
+      gapTitle = '🎭 이중생활 마스터';
+      gapDesc = '차가운 프사 뒤에 숨겨진 반전들';
+      gapDetail = '프사가 보여주는 쿨한 이미지는 당신의 한 면일 뿐이에요. <span class="highlight">상황에 따라 완전히 다른 사람</span>이 되는 능력이 있고, 그걸 자연스럽게 해내요. 사람들은 당신의 어떤 모습이 진짜인지 궁금해하죠.';
+    } else {
+      gapTitle = '🎭 겉과 속 다른 매력';
+      gapDesc = '프사로는 알 수 없는 숨겨진 면이 있는 사람';
+      gapDetail = '당신은 <span class="highlight">보여주고 싶은 모습과 진짜 모습 사이에 거리</span>가 있다는 걸 스스로 알고 있어요. 그 갭이 매력이 되기도 하고, 가끔 외로움이 되기도 해요.';
+    }
+  } else { // adaptive
+    if (isHip) {
+      gapTitle = '🌊 카멜레온 감각파';
+      gapDesc = '힙한 프사처럼, 어디서든 분위기를 읽는 사람';
+      gapDetail = '상황에 따라 달라지는 당신의 성격은 프사의 감각적인 느낌과 잘 맞아요. <span class="highlight">어떤 모임에서든 자연스럽게 적응</span>하는 능력이 당신의 최대 강점이에요.';
+    } else if (isWarm) {
+      gapTitle = '🌊 유연한 소통러';
+      gapDesc = '프사도 따뜻하고 실제로도 유연한 만능형';
+      gapDetail = '따뜻한 프사 이미지 그대로, 실제로도 <span class="highlight">상대에 맞춰 대화를 잘 이끌어가는 타입</span>이에요. 다만 남들에게 맞추다 보면 정작 본인이 뭘 원하는지 놓칠 때가 있어요.';
+    } else {
+      gapTitle = '🌊 상황 맞춤형 인간';
+      gapDesc = '한마디로 정의할 수 없는 사람';
+      gapDetail = '프사의 분위기도 딱 하나로 정의하기 어렵고, 실제 성격도 그래요. <span class="highlight">만나는 사람마다 당신을 다르게 기억</span>해요. 그게 장점이자 당신만의 특별함이에요.';
+    }
+  }
+
+  return `
+    <div class="insight-card anim-in" style="transition-delay:0.75s; border-color:rgba(244,114,182,0.15);">
+      <div class="insight-title" style="color:var(--pink)">🔀 프사 vs 실제 나</div>
+      <p style="font-size:1.05rem;font-weight:700;margin-bottom:4px;">${gapTitle}</p>
+      <p style="font-size:0.85rem;color:var(--dim);margin-bottom:12px;">${gapDesc}</p>
+      <p>${gapDetail}</p>
+    </div>
+  `;
+}
+
+// ══════════════════════════════
+//  RESULT TYPES (24 types)
+// ══════════════════════════════
+function getTypeKey(scores) {
+  const {likeable:l, trust:t, hip:h, distance:d} = scores;
+  const avg = (l+t+h)/3;
+  const antiDist = 100 - d;
+  const overall = avg*0.7 + antiDist*0.3;
+
+  let grade, subIndex;
+  if (overall >= 72) grade = 'A';
+  else if (overall >= 58) grade = 'B';
+  else if (overall >= 44) grade = 'C';
+  else grade = 'D';
+
+  // Pick sub-type based on dominant trait
+  if (grade === 'A') {
+    if (l >= t && l >= h) subIndex = l>80?6:1; // 햇살 or 프리패스
+    else if (t >= l && t >= h) subIndex = 2;
+    else if (h >= l && h >= t) subIndex = d>55?3:5; // 카리스마 or 힙스터
+    else subIndex = 4;
+  } else if (grade === 'B') {
+    if (l >= t && l >= h) subIndex = l>65?1:4;
+    else if (t >= l && t >= h) subIndex = t>65?2:5;
+    else if (d > 55) subIndex = 6;
+    else subIndex = 3;
+  } else if (grade === 'C') {
+    if (d >= 65) subIndex = d>75?3:1;
+    else if (h > 60) subIndex = 6;
+    else if (t > 60) subIndex = 4;
+    else if (l < 50) subIndex = 5;
+    else subIndex = 2;
+  } else {
+    // D grade - pick based on lowest area
+    if (l < 45 && h < 45) subIndex = 6;
+    else if (l < 45) subIndex = 1;
+    else if (h < 50) subIndex = 3;
+    else if (d > 70) subIndex = 4;
+    else if (t < 45) subIndex = 5;
+    else subIndex = 2;
+  }
+
+  return grade + subIndex;
+}
+
+// ══════════════════════════════
+//  SHOW RESULT
+// ══════════════════════════════
+function showResult(scores) {
+  const typeKey = getTypeKey(scores);
+  const t = types[typeKey];
+  const gradeClass = `grade-${t.grade}`;
+  const gradeLabels = {A:'✨ PREMIUM', B:'👍 GOOD', C:'⚡ POTENTIAL', D:'🔧 UPGRADE'};
+
+  let html = `
+    <div class="anim-in" style="text-align:center">
+      ${mode==='upload' && photoScores ? '<div style="display:inline-block;padding:5px 14px;border-radius:100px;font-size:0.72rem;font-weight:600;background:rgba(34,211,238,0.1);color:var(--cyan);border:1px solid rgba(34,211,238,0.12);margin-bottom:10px;">📷 사진 + 유형 종합 분석</div><br>' : ''}
+      <div class="result-badge ${gradeClass}">${gradeLabels[t.grade]} · ${t.grade} GRADE</div>
+      <h1 class="result-type-name">${t.emoji} ${t.name}</h1>
+      <p class="result-oneliner">${t.desc}</p>
+      <p style="margin-top:14px;padding:8px 18px;display:inline-block;background:rgba(244,114,182,0.08);border:1px solid rgba(244,114,182,0.15);border-radius:100px;font-size:0.8rem;color:#f472b6;font-weight:600;">🔥 ${hotLines[Math.floor(Math.random()*hotLines.length)]}</p>
+    </div>
+
+    <div class="scores-card anim-in" style="transition-delay:0.15s">
+      <div class="score-row">
+        <div class="score-label"><span class="score-name">💜 호감도</span><span class="score-val" style="color:var(--accent)">${scores.likeable}</span></div>
+        <div class="score-bar"><div class="score-bar-fill bar-likeable" data-w="${scores.likeable}"></div></div>
+      </div>
+      <div class="score-row">
+        <div class="score-label"><span class="score-name">🩵 신뢰감</span><span class="score-val" style="color:var(--cyan)">${scores.trust}</span></div>
+        <div class="score-bar"><div class="score-bar-fill bar-trust" data-w="${scores.trust}"></div></div>
+      </div>
+      <div class="score-row">
+        <div class="score-label"><span class="score-name">💗 힙함</span><span class="score-val" style="color:var(--pink)">${scores.hip}</span></div>
+        <div class="score-bar"><div class="score-bar-fill bar-hip" data-w="${scores.hip}"></div></div>
+      </div>
+      <div class="score-row">
+        <div class="score-label"><span class="score-name">🧡 거리감</span><span class="score-val" style="color:var(--amber)">${scores.distance}</span></div>
+        <div class="score-bar"><div class="score-bar-fill bar-distance" data-w="${scores.distance}"></div></div>
+      </div>
+    </div>
+
+    <div class="insight-card anim-in" style="transition-delay:0.3s">
+      <div class="insight-title">🎯 첫인상 한 줄 요약</div>
+      <p>${t.insight1}</p>
+    </div>
+
+    <div class="insight-card anim-in" style="transition-delay:0.45s">
+      <div class="insight-title">🤭 혹시 이런 경험 있나요?</div>
+      <p>${t.insight2}</p>
+    </div>
+
+    <div class="insight-card anim-in" style="transition-delay:0.6s">
+      <div class="insight-title">🔮 프사 뒤에 숨겨진 진짜 당신</div>
+      <p>${t.insight3}</p>
+    </div>
+
+    ${buildGapAnalysis(scores, t)}
+
+    <div class="tip-card anim-in" style="transition-delay:0.95s">
+      <div class="tip-title">💡 개선 팁</div>
+      <p>${t.tip}</p>
+    </div>
+
+    ${mode==='upload' && window._analysisFeatures ? buildPhotoInsights(window._analysisFeatures) : ''}
+
+    <div class="anim-in" style="transition-delay:${mode==='upload'?'1.2s':'0.95s'}; text-align:center; margin:20px 0 8px;">
+      <p style="font-size:0.95rem;color:var(--pink);font-weight:600;">${tagLines[Math.floor(Math.random()*tagLines.length)]}</p>
+    </div>
+
+    <div class="action-btns anim-in" style="transition-delay:${mode==='upload'?'1.35s':'1.1s'}">
+      <button class="share-btn kakao" onclick="shareKakao()">💬 카카오톡 공유하기</button>
+      <button class="share-btn primary" onclick="downloadCard('feed')">📸 결과 카드 저장하기</button>
+      <button class="share-btn secondary" onclick="copyResult()">📋 결과 텍스트 복사</button>
+      <button class="retry-btn" onclick="retry()">🔄 다시 하기</button>
+    </div>
+  `;
+
+  document.getElementById('resultContent').innerHTML = html;
+  showScreen('resultScreen');
+
+  // Animate score bars (delayed for watch-through effect)
+  setTimeout(() => {
+    document.querySelectorAll('.score-bar-fill').forEach(bar => {
+      bar.style.width = bar.dataset.w + '%';
+    });
+  }, 700);
+
+  // Scroll animation
+  setTimeout(() => {
+    document.querySelectorAll('.anim-in').forEach(el => el.classList.add('visible'));
+  }, 100);
+
+  // Store for sharing
+  window._lastResult = {scores, typeKey, type:t};
+}
+
+// ══════════════════════════════
+//  SHARE CARD
+// ══════════════════════════════
+function downloadCard(format) {
+  const {scores, type:t} = window._lastResult;
+  const canvas = document.getElementById('shareCanvas');
+  const size = 1080;
+  canvas.width = size; canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  // Background
+  const grad = ctx.createLinearGradient(0, 0, size, size);
+  grad.addColorStop(0, '#0b0b10');
+  grad.addColorStop(0.5, '#141420');
+  grad.addColorStop(1, '#1a1028');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, size, size);
+
+  // Decorative circles
+  ctx.globalAlpha = 0.06;
+  ctx.fillStyle = '#a78bfa';
+  ctx.beginPath(); ctx.arc(200, 200, 300, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#f472b6';
+  ctx.beginPath(); ctx.arc(880, 800, 250, 0, Math.PI*2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  // Title
+  ctx.fillStyle = '#6b6b8a';
+  ctx.font = '600 32px "Noto Sans KR", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('남들이 보는 내 첫인상은?', size/2, 120);
+
+  // Type name
+  ctx.fillStyle = '#ffffff';
+  ctx.font = '800 72px "Noto Sans KR", sans-serif';
+  ctx.fillText(`${t.emoji} ${t.name}`, size/2, 280);
+
+  // Description
+  ctx.fillStyle = '#9b9bb0';
+  ctx.font = '400 30px "Noto Sans KR", sans-serif';
+  ctx.fillText(t.desc, size/2, 340);
+
+  // 🔥 논란 문장
+  ctx.fillStyle = '#f472b6';
+  ctx.font = '600 26px "Noto Sans KR", sans-serif';
+  ctx.fillText(hotLines[Math.floor(Math.random()*hotLines.length)], size/2, 390);
+
+  // Score bars
+  const barX = 180, barW = 720, barH = 32, barR = 16;
+  const scoreData = [
+    {label:'호감도', val:scores.likeable, color:'#a78bfa'},
+    {label:'신뢰감', val:scores.trust, color:'#22d3ee'},
+    {label:'힙함', val:scores.hip, color:'#f472b6'},
+    {label:'거리감', val:scores.distance, color:'#fbbf24'},
+  ];
+
+  scoreData.forEach((s, i) => {
+    const y = 440 + i * 90;
+
+    // Label
+    ctx.fillStyle = '#e8e8f0';
+    ctx.font = '600 28px "Noto Sans KR", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(s.label, barX, y - 12);
+
+    // Value
+    ctx.textAlign = 'right';
+    ctx.fillStyle = s.color;
+    ctx.font = '700 28px "Outfit", "Noto Sans KR", sans-serif';
+    ctx.fillText(s.val, barX + barW, y - 12);
+
+    // Bar bg
+    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+    roundRect(ctx, barX, y, barW, barH, barR);
+
+    // Bar fill
+    ctx.fillStyle = s.color;
+    const fillW = Math.max(barR*2, barW * s.val / 100);
+    roundRect(ctx, barX, y, fillW, barH, barR);
+  });
+
+  // Bottom CTA
+  ctx.fillStyle = '#6b6b8a';
+  ctx.font = '500 28px "Noto Sans KR", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('이 유형인 친구 태그해봐 😂', size/2, 920);
+
+  // Branding
+  ctx.fillStyle = 'rgba(107,107,138,0.4)';
+  ctx.font = '400 22px "Noto Sans KR", sans-serif';
+  ctx.fillText('프사 인상 리포트 2026', size/2, 1010);
+
+  // Download
+  canvas.toBlob(function(blob) {
+    const url = URL.createObjectURL(blob);
+    
+    // Try download link first (works on desktop + some Android)
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `프사인상리포트_${t.name}.png`;
+    
+    // Check if likely mobile (iOS Safari / in-app browser)
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isInApp = /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line/i.test(navigator.userAgent);
+    
+    if (isIOS || isInApp) {
+      // Mobile fallback: show image in modal for long-press save
+      const modal = document.createElement('div');
+      modal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.92);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;';
+      modal.innerHTML = `
+        <p style="color:#fff;font-size:14px;margin-bottom:12px;text-align:center;font-family:'Noto Sans KR',sans-serif;">이미지를 꾹 눌러서 저장하세요 📲</p>
+        <img src="${url}" style="max-width:90%;max-height:70vh;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+        <button style="margin-top:16px;padding:12px 32px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:100px;color:#fff;font-size:14px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;" onclick="this.parentElement.remove()">닫기</button>
+      `;
+      modal.addEventListener('click', (e) => { if(e.target === modal) modal.remove(); });
+      document.body.appendChild(modal);
+      showToast('이미지를 꾹 눌러 저장!');
+    } else {
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 3000);
+      showToast('카드가 저장되었습니다!');
+    }
+  }, 'image/png');
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.lineTo(x+w-r, y);
+  ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+  ctx.lineTo(x+w, y+h-r);
+  ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  ctx.lineTo(x+r, y+h);
+  ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+  ctx.lineTo(x, y+r);
+  ctx.quadraticCurveTo(x, y, x+r, y);
+  ctx.closePath();
+  ctx.fill();
+}
+
+function shareKakao() {
+  const {scores, type:t} = window._lastResult;
+  const provocLines = [
+    "이 유형은 은근히 인기 많다는데?",
+    "이 프사 쓰면 DM 올 확률 높다고 함",
+    "이 유형 의외로 주변에 팬 많음",
+    "이 프사 때문에 오해 받고 있을 수도...",
+    "이거 보고 소름 돋았음",
+  ];
+  const provoc = provocLines[Math.floor(Math.random()*provocLines.length)];
+  const shareTitle = `🧠 프사 인상 리포트: ${t.emoji} ${t.name}`;
+  const shareText = `${t.desc}\n\n💜 호감도 ${scores.likeable} | 🩵 신뢰감 ${scores.trust} | 💗 힙함 ${scores.hip}\n\n${provoc}\n너도 해보고 결과 알려줘 👀`;
+  const shareUrl = window.location.href;
+
+  // 1) Try Web Share API (mobile → KakaoTalk selectable)
+  if (navigator.share) {
+    navigator.share({
+      title: shareTitle,
+      text: shareText,
+      url: shareUrl,
+    }).catch(() => {});
+    return;
+  }
+
+  // 2) Try KakaoTalk URL scheme (mobile fallback)
+  const kakaoMsg = encodeURIComponent(`${shareTitle}\n${shareText}\n\n${shareUrl}`);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const isAndroid = /Android/i.test(navigator.userAgent);
+
+  if (isIOS || isAndroid) {
+    const kakaoLink = `kakaotalk://msg?text=${kakaoMsg}`;
+    const opened = window.open(kakaoLink, '_blank');
+    // If scheme fails, fall through to clipboard
+    setTimeout(() => {
+      if (!document.hidden) {
+        fallbackCopyLink(shareTitle, shareText, shareUrl);
+      }
+    }, 1500);
+    return;
+  }
+
+  // 3) Desktop fallback → copy link
+  fallbackCopyLink(shareTitle, shareText, shareUrl);
+}
+
+function fallbackCopyLink(title, text, url) {
+  const fullText = `${title}\n${text}\n\n${url}`;
+  copyToClipboard(fullText).then(() => {
+    showToast('📋 공유 내용이 복사되었습니다! 카톡에 붙여넣기 하세요');
+  }).catch(() => {
+    showToast('복사에 실패했습니다');
+  });
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+  // Fallback for mobile / non-HTTPS
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try {
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  } catch(e) {
+    document.body.removeChild(ta);
+    return Promise.reject(e);
+  }
+}
+
+function copyResult() {
+  const {scores, type:t} = window._lastResult;
+  const provocs = ["이 유형은 은근히 인기 많다는데?","이 프사 쓰면 DM 올 확률 높다고 함","이거 보고 소름 돋았음"];
+  const p = provocs[Math.floor(Math.random()*provocs.length)];
+  const text = `🧠 프사 인상 리포트\n\n${t.emoji} ${t.name}\n${t.desc}\n\n💜 호감도 ${scores.likeable} | 🩵 신뢰감 ${scores.trust}\n💗 힙함 ${scores.hip} | 🧡 거리감 ${scores.distance}\n\n🎯 ${t.insight1}\n\n${p}\n너도 해보고 결과 알려줘 👀`;
+  copyToClipboard(text).then(() => {
+    showToast('결과가 복사되었습니다!');
+  }).catch(() => {
+    showToast('복사에 실패했습니다');
+  });
+}
+
+function retry() {
+  uploadedImage = null;
+  uploadedDataURL = null;
+  selectAnswers = {};
+  currentQ = 0;
+  photoScores = null;
+  window._analysisFeatures = null;
+  const zone = document.getElementById('uploadZone');
+  const img = zone.querySelector('img');
+  if (img) img.remove();
+  zone.classList.remove('has-image');
+  document.getElementById('analyzeBtn').classList.remove('ready');
+  document.getElementById('fileInput').value = '';
+  document.getElementById('progressFill').style.width = '0%';
+  goMain();
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
