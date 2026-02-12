@@ -3,21 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Product Builder</title>
+  <title>로또 번호 생성기</title>
   <link href="style.css" rel="stylesheet">
 </head>
 <body>
   <header>
-    <h1>Product Builder</h1>
+    <h1>로또 번호 생성기</h1>
     <button id="theme-toggle" aria-label="테마 전환">
       <span class="icon-sun">&#9728;</span>
       <span class="icon-moon">&#9790;</span>
     </button>
   </header>
   <main>
-    <section class="hero">
-      <h2>Welcome!</h2>
-      <p>다크모드 / 라이트모드를 전환해보세요.</p>
+    <section class="lotto-card">
+      <h2>이번 주 행운의 번호는?</h2>
+      <div id="lotto-numbers" class="number-row">
+        <div class="ball empty">?</div>
+        <div class="ball empty">?</div>
+        <div class="ball empty">?</div>
+        <div class="ball empty">?</div>
+        <div class="ball empty">?</div>
+        <div class="ball empty">?</div>
+        <div class="bonus-separator">+</div>
+        <div class="ball empty bonus">?</div>
+      </div>
+      <button id="generate-btn" class="generate-btn">번호 생성</button>
+      <div id="history" class="history">
+        <h3>생성 기록</h3>
+        <ul id="history-list"></ul>
+      </div>
     </section>
   </main>
   <script defer src="main.js"></script>
